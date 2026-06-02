@@ -145,7 +145,7 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "Since I talk to so many different customers, I’m constantly seeing new business problems and coming up with new ideas. We’ve gone zero to one, and I’ve learned what it means to not just to build, but how to sell, think about product, and solve deep technical problems.",
+      "“Since I talk to so many different customers, I’m constantly seeing new business problems and coming up with new ideas. We’ve gone zero to one, and I’ve learned what it means to not just to build, but how to sell, think about product, and solve deep technical problems.”",
     name: "Ollie Elmgren",
     role: "Engineer at Listen Labs",
     image: "/images/testimonial-ollie.png",

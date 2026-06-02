@@ -11,16 +11,18 @@ export function Apply() {
     <section className="bg-surface-primary px-4 pb-6 pt-6 md:px-6">
       <SectionLabel id="apply" label="Apply" />
 
-      <div className="relative mt-6 min-h-[640px] overflow-hidden p-4 md:min-h-[760px] md:p-6">
+      {/* Full-bleed photo. On mobile the card sits at the bottom so the image
+          shows above it; on desktop the card fills the left column. */}
+      <div className="relative mt-6 flex min-h-[620px] items-end overflow-hidden p-4 md:min-h-[760px] md:items-stretch md:p-6">
         <Figure
           src="/images/apply-bg.webp"
           alt="A researcher inspecting a sample in a cleanroom"
           className="absolute inset-0 h-full w-full"
-          objectPosition="center right"
+          objectPosition="center"
         />
 
         <Reveal
-          className="relative flex h-full w-full max-w-[572px] flex-col"
+          className="relative flex w-full max-w-[572px] flex-col self-end md:self-stretch"
           amount={0.2}
         >
           {/* Content card */}

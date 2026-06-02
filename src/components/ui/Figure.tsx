@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 
 /**
  * Image with a graceful, on-brand fallback.
  *
- * Renders the real asset at `src`; if the file isn't present yet it hides the
- * broken image and shows a branded placeholder underneath (initials for people,
- * a label otherwise). The instant the real export is added to /public/images,
- * it appears with no code change.
+ * The real image is always rendered at full opacity with the fallback sitting
+ * *behind* it — so whenever the image has data it simply covers the fallback,
+ * with no JS load-event gating (which previously caused images to occasionally
+ * stay hidden when they loaded from the SSR HTML before React hydrated). If the
+ * image 404s, onError reveals the fallback.
  *
  * `variant="duotone"` reproduces the design's mentor/testimonial treatment:
  * a brand-blue plate with the photo composited via mix-blend-screen.
@@ -32,24 +33,10 @@ export function Figure({
   className?: string;
   imgClassName?: string;
   objectPosition?: string;
-  /**
-   * Whether to apply mix-blend-screen to the loaded image (duotone only).
-   * Set false when the source image is already a composited duotone export,
-   * so we keep the brand-blue fallback plate but don't blend twice.
-   */
+  /** Apply mix-blend-screen to the image (duotone only, raw photos). */
   blendImage?: boolean;
 }) {
-  const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  // The image often finishes loading from the SSR HTML before React attaches
-  // onLoad, so that event never fires and the image would stay hidden. Check
-  // `complete` on mount (and when src changes) to catch that race.
-  useEffect(() => {
-    const img = imgRef.current;
-    if (img && img.complete && img.naturalWidth > 0) setLoaded(true);
-  }, [src]);
 
   const initials = name
     ? name
@@ -68,39 +55,33 @@ export function Figure({
         isDuotone ? "bg-surface-brand-primary" : "bg-surface-secondary",
         className,
       )}
-      aria-label={!loaded ? alt : undefined}
-      role={!loaded ? "img" : undefined}
     >
-      {/* Branded fallback (sits behind the photo; visible until it loads). */}
-      {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center select-none">
-          {isDuotone ? (
-            <span
-              className="text-content-brand-contrast/70 tracking-tight-2"
-              style={{ fontSize: "clamp(28px, 8vw, 56px)" }}
-            >
-              {initials}
-            </span>
-          ) : (
-            <span className="text-content-secondary text-[14px] tracking-tight-2">
-              {alt}
-            </span>
-          )}
-        </div>
-      )}
+      {/* Branded fallback — sits behind the photo and shows through until the
+          image paints (or permanently if it fails to load). */}
+      <div className="absolute inset-0 flex items-center justify-center select-none">
+        {isDuotone ? (
+          <span
+            className="text-content-brand-contrast/70 tracking-tight-2"
+            style={{ fontSize: "clamp(28px, 8vw, 56px)" }}
+          >
+            {initials}
+          </span>
+        ) : (
+          <span className="text-content-secondary text-[14px] tracking-tight-2">
+            {alt}
+          </span>
+        )}
+      </div>
 
       {!failed && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          ref={imgRef}
           src={src}
           alt={alt}
-          onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
           className={cn(
-            "absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
+            "absolute inset-0 h-full w-full object-cover",
             isDuotone && blendImage && "mix-blend-screen",
-            loaded ? "opacity-100" : "opacity-0",
             imgClassName,
           )}
           style={objectPosition ? { objectPosition } : undefined}

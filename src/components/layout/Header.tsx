@@ -9,9 +9,9 @@ import { Logo } from "@/components/ui/Logo";
 import { ApplyButton } from "@/components/ui/ApplyButton";
 
 /**
- * Top bar: logo, inline nav (desktop) or a hamburger that morphs into a
- * full-screen menu (mobile). Sits transparent over the hero, matching the
- * design's editorial, in-hero navigation.
+ * Sticky top navigation. 68px tall on desktop. Stays pinned to the top of the
+ * viewport on scroll (on both desktop and mobile). The hamburger opens a
+ * full-screen menu on mobile.
  */
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -34,8 +34,8 @@ export function Header() {
   }, []);
 
   return (
-    <header className="absolute inset-x-0 top-[22px] z-50">
-      <div className="flex items-center justify-between px-4 py-4 md:px-6">
+    <header className="sticky top-0 z-50 bg-surface-primary">
+      <div className="flex h-14 items-center justify-between px-4 md:h-[68px] md:px-6">
         <a href="#top" aria-label="Listen — home" className="text-content-brand">
           <Logo className="text-[18px]" />
         </a>
@@ -47,18 +47,16 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Mobile controls */}
-        <div className="flex items-center gap-4 md:hidden">
-          <button
-            type="button"
-            aria-label="Open menu"
-            aria-expanded={open}
-            onClick={() => setOpen(true)}
-            className="text-content-brand"
-          >
-            <Menu size={24} strokeWidth={2} />
-          </button>
-        </div>
+        {/* Mobile control */}
+        <button
+          type="button"
+          aria-label="Open menu"
+          aria-expanded={open}
+          onClick={() => setOpen(true)}
+          className="text-content-brand md:hidden"
+        >
+          <Menu size={24} strokeWidth={2} />
+        </button>
       </div>
 
       <AnimatePresence>
@@ -91,7 +89,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       exit={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
       transition={spring}
     >
-      <div className="flex items-center justify-between px-4 py-4 pt-[26px]">
+      <div className="flex h-14 items-center justify-between px-4">
         <span className="text-[18px] text-content-brand">
           <Logo />
         </span>

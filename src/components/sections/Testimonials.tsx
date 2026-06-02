@@ -16,6 +16,7 @@ import { Figure } from "@/components/ui/Figure";
 export function Testimonials() {
   const [active, setActive] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const ready = useRef(false);
 
   // Cursor-following card (desktop only). Springs toward the pointer.
   const x = useMotionValue(0);
@@ -24,6 +25,13 @@ export function Testimonials() {
   const sy = useSpring(y, springSnappyOptions);
 
   function handleMove(e: React.MouseEvent) {
+    // The first time we know where the cursor is, snap the spring there so the
+    // card never flies in from the top-left corner (0,0).
+    if (!ready.current) {
+      sx.jump(e.clientX);
+      sy.jump(e.clientY);
+      ready.current = true;
+    }
     x.set(e.clientX);
     y.set(e.clientY);
   }
@@ -49,7 +57,10 @@ export function Testimonials() {
                   // Dim the other quote while one is hovered (desktop).
                   opacity: active === null || active === i ? 1 : 0.35,
                 }}
-                onMouseEnter={() => setActive(i)}
+                onMouseEnter={(e) => {
+                  handleMove(e); // position the card at the cursor before showing
+                  setActive(i);
+                }}
                 onMouseLeave={() => setActive(null)}
               >
                 {t.quote}

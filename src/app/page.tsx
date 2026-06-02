@@ -1,3 +1,5 @@
+import { Marquee } from "@/components/layout/Marquee";
+import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/sections/Hero";
 import { Edge } from "@/components/sections/Edge";
 import { Details } from "@/components/sections/Details";
@@ -9,15 +11,20 @@ import { MobileApplyBar } from "@/components/layout/MobileApplyBar";
 
 export default function Home() {
   return (
-    <main>
-      <Hero />
-      <Edge />
-      <Details />
-      <Mentors />
-      <Testimonials />
-      <Apply />
-      <Footer />
+    <>
+      {/* Marquee scrolls away; the nav below it stays sticky at the top. */}
+      <Marquee />
+      <Header />
+      <main>
+        <Hero />
+        <Edge />
+        <Details />
+        <Mentors />
+        <Testimonials />
+        <Apply />
+        <Footer />
+      </main>
       <MobileApplyBar />
-    </main>
+    </>
   );
 }
