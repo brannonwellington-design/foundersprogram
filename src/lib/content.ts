@@ -42,6 +42,12 @@ export const EDGE = {
   body: "You already know how to code. The hard part is knowing what to build. Listen’s Founder Program gives you that: daily, firsthand exposure to the problems customers are desperate to solve, across every industry.",
 };
 
+/** Listening-device photos for the Program section (cursor trail / scroll scrub). */
+export const LISTENING_DEVICES = Array.from(
+  { length: 13 },
+  (_, i) => `/images/listening_device_${String(i + 1).padStart(2, "0")}.webp`,
+);
+
 export type Detail = { n: string; title: string; body: string };
 
 export const DETAILS: Detail[] = [

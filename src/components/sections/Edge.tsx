@@ -1,68 +1,203 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
-import { EDGE } from "@/lib/content";
-import { Reveal } from "@/components/motion/Reveal";
+import { useEffect, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  type MotionValue,
+} from "motion/react";
+import { EDGE, LISTENING_DEVICES } from "@/lib/content";
+import { springSoft } from "@/lib/motion";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Figure } from "@/components/ui/Figure";
+import { cn } from "@/lib/cn";
 
 export function Edge() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  // Two images drift at different rates for depth.
-  const yMain = useTransform(scrollYProgress, [0, 1], ["8%", "-8%"]);
-  const ySecondary = useTransform(scrollYProgress, [0, 1], ["20%", "-20%"]);
+  const sectionRef = useRef<HTMLElement>(null);
 
   return (
-    <section className="bg-surface-primary px-4 pb-24 pt-20 md:px-6 md:pt-0">
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden bg-surface-primary px-4 pb-24 pt-20 md:px-6 md:pt-0"
+    >
       <SectionLabel id="program" label="The Program" />
 
-      <Reveal className="mx-auto mt-24 flex max-w-[755px] flex-col items-center gap-4 text-center">
-        <h2
-          className="text-content-brand tracking-tight-2"
-          style={{ fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.2 }}
+      {/* Body copy — constrained to the central image's width, centered. */}
+      <motion.p
+        className="mx-auto mt-16 max-w-[472px] text-center text-[20px] text-content-brand tracking-tight-2"
+        style={{ lineHeight: 1.4 }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.6 }}
+        transition={springSoft}
+      >
+        {EDGE.body}
+      </motion.p>
+
+      {/* Central image with the oversized headline overlapping in front. */}
+      <div className="relative mx-auto mt-12 w-full max-w-[472px]">
+        <motion.div
+          className="relative z-0 aspect-[472/560] w-full"
+          initial={{ opacity: 0, scale: 1.03 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={springSoft}
+        >
+          <Figure
+            src="/images/program-center.webp"
+            alt="A founder listening on the phone"
+            className="h-full w-full"
+          />
+        </motion.div>
+
+        <motion.h2
+          className="pointer-events-none absolute left-1/2 top-1/2 z-10 w-screen -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center text-content-brand tracking-tight-2"
+          style={{ fontSize: "clamp(2.5rem, 10.2vw, 12rem)", lineHeight: 1 }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={springSoft}
         >
           {EDGE.title}
-        </h2>
-        <p
-          className="max-w-[569px] text-content-brand-secondary text-[20px] tracking-tight-2"
-          style={{ lineHeight: 1.4 }}
-        >
-          {EDGE.body}
-        </p>
-      </Reveal>
-
-      {/* Image composition */}
-      <div
-        ref={ref}
-        className="relative mx-auto mt-16 h-[560px] w-full max-w-[640px] md:h-[640px]"
-      >
-        <motion.div
-          style={{ y: yMain }}
-          className="absolute left-1/2 top-0 h-[88%] w-[72%] -translate-x-1/2"
-        >
-          <Figure
-            src="/images/edge-1.webp"
-            alt="Field engineers at a satellite array"
-            className="h-full w-full"
-          />
-        </motion.div>
-        <motion.div
-          style={{ y: ySecondary }}
-          className="absolute right-0 top-[28%] h-[44%] w-[36%] md:right-[4%]"
-        >
-          <Figure
-            src="/images/edge-2.webp"
-            alt="An iridescent telephone handset"
-            className="h-full w-full"
-          />
-        </motion.div>
+        </motion.h2>
       </div>
+
+      <DeviceShowcase sectionRef={sectionRef} />
     </section>
+  );
+}
+
+/** Picks the desktop cursor trail or the mobile scroll-scrub based on pointer. */
+function DeviceShowcase({
+  sectionRef,
+}: {
+  sectionRef: React.RefObject<HTMLElement | null>;
+}) {
+  const [fine, setFine] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setFine(window.matchMedia("(pointer: fine)").matches);
+    // Preload all device photos so neither mode flickers.
+    LISTENING_DEVICES.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
+  if (fine === null) return null;
+  return fine ? (
+    <DeviceTrail sectionRef={sectionRef} />
+  ) : (
+    <DeviceScrub sectionRef={sectionRef} />
+  );
+}
+
+type TrailItem = { id: number; src: string; x: number; y: number };
+
+/** Desktop: device photos spawn at the cursor and fade out as you move. */
+function DeviceTrail({
+  sectionRef,
+}: {
+  sectionRef: React.RefObject<HTMLElement | null>;
+}) {
+  const [items, setItems] = useState<TrailItem[]>([]);
+  const id = useRef(0);
+  const imgIdx = useRef(0);
+  const last = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    function onMove(e: MouseEvent) {
+      const rect = el!.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const l = last.current;
+      const dist = l ? Math.hypot(x - l.x, y - l.y) : Infinity;
+      if (dist < 90) return; // spawn cadence by distance moved
+      last.current = { x, y };
+
+      const src = LISTENING_DEVICES[imgIdx.current % LISTENING_DEVICES.length];
+      imgIdx.current += 1;
+      const itemId = id.current++;
+      setItems((prev) => [...prev.slice(-7), { id: itemId, src, x, y }]);
+      window.setTimeout(
+        () => setItems((prev) => prev.filter((it) => it.id !== itemId)),
+        700,
+      );
+    }
+
+    el.addEventListener("mousemove", onMove);
+    return () => el.removeEventListener("mousemove", onMove);
+  }, [sectionRef]);
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden>
+      <AnimatePresence>
+        {items.map((it) => (
+          <motion.img
+            key={it.id}
+            src={it.src}
+            alt=""
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.12 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="absolute w-[clamp(108px,11vw,168px)] -translate-x-1/2 -translate-y-1/2 object-cover"
+            style={{ left: it.x, top: it.y, aspectRatio: "800 / 1062" }}
+          />
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/** Mobile: a device photo frame cycles through all 13 as the section scrolls. */
+function DeviceScrub({
+  sectionRef,
+}: {
+  sectionRef: React.RefObject<HTMLElement | null>;
+}) {
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const sp = scrollYProgress as MotionValue<number>;
+    return sp.on("change", (v) => {
+      const i = Math.min(
+        LISTENING_DEVICES.length - 1,
+        Math.max(0, Math.floor(v * LISTENING_DEVICES.length)),
+      );
+      setIdx(i);
+    });
+  }, [scrollYProgress]);
+
+  return (
+    <div
+      className="pointer-events-none absolute right-3 top-[34%] z-20 w-[40%] max-w-[190px]"
+      aria-hidden
+    >
+      <div className="relative aspect-[800/1062] w-full">
+        {LISTENING_DEVICES.map((src, i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={src}
+            src={src}
+            alt=""
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover",
+              i === idx ? "opacity-100" : "opacity-0",
+            )}
+            loading="eager"
+            decoding="async"
+          />
+        ))}
+      </div>
+    </div>
   );
 }
