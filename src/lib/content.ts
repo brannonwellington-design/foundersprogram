@@ -97,16 +97,16 @@ export const MENTORS: Mentor[] = [
     image: "/images/mentor-alfred.png",
   },
   {
-    name: "Mar Hershenson",
-    role: "Partner at Pear VC, Professor at Stanford Business School",
-    bio: "One of the sharpest minds on idea generation and early-stage company building",
-    image: "/images/mentor-mar.png",
-  },
-  {
     name: "Florian Juengermann",
     role: "CTO & Co-Founder, Listen Labs",
     bio: "Brings deep perspective as a technical founder on building a product that customers love and how to develop the instincts to get you there faster",
     image: "/images/mentor-florian.png",
+  },
+  {
+    name: "Mar Hershenson",
+    role: "Partner at Pear VC, Professor at Stanford Business School",
+    bio: "One of the sharpest minds on idea generation and early-stage company building",
+    image: "/images/mentor-mar.png",
   },
   {
     name: "Mike Vernal",
