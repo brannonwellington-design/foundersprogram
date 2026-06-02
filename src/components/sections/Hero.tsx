@@ -45,10 +45,11 @@ export function Hero() {
             <motion.h1
               variants={lineUp}
               transition={springSoft}
-              className="max-w-none text-content-brand tracking-tight-2 md:max-w-[12ch]"
-              style={{ fontSize: "clamp(2.5rem, 6.4vw, 5.5rem)", lineHeight: 1.05 }}
+              className="max-w-none text-content-brand tracking-tight-2"
+              style={{ fontSize: "clamp(2.5rem, 5.6vw, 5.5rem)", lineHeight: 1.05 }}
             >
-              {HERO.title}
+              {/* Keep "Founder Program" on one line (non-breaking space). */}
+              {HERO.title.replace("Founder Program", "Founder\u00A0Program")}
             </motion.h1>
           </motion.div>
 
@@ -83,11 +84,6 @@ export function Hero() {
               <ApplyButton />
             </motion.div>
           </motion.div>
-        </div>
-
-        {/* Mobile-only inline CTA; also the sentinel for the sticky bar. */}
-        <div id="hero-cta-sentinel" className="mt-8 md:hidden">
-          <ApplyButton fill />
         </div>
       </div>
     </section>

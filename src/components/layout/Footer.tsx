@@ -21,8 +21,9 @@ export function Footer() {
   return (
     <footer
       ref={ref}
-      // Extra bottom padding on mobile so the wordmark sits above the sticky CTA.
-      className="px-6 pb-28 pt-[14vh] text-content-brand md:pb-6"
+      data-hide-apply-bar
+      // 16px inset on mobile (the sticky Apply bar hides at the footer); 24px on desktop.
+      className="px-4 pb-4 pt-[14vh] text-content-brand md:px-6 md:pb-6"
     >
       <svg
         viewBox={`0 0 ${w} ${h}`}

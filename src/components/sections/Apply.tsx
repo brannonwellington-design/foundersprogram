@@ -28,6 +28,7 @@ export function Apply() {
   return (
     <section
       ref={sectionRef}
+      data-hide-apply-bar
       className="bg-surface-primary px-4 pb-6 pt-6 md:px-6"
     >
       <SectionLabel id="apply" label="Apply" />
@@ -54,23 +55,15 @@ export function Apply() {
             className="flex w-full max-w-[572px] flex-col self-end md:self-stretch"
           >
             <div className="flex flex-1 flex-col justify-between gap-12 bg-surface-primary p-6">
-              <div className="flex flex-col gap-2">
-                <h2
-                  className="text-content-brand tracking-tight-2"
-                  style={{ fontSize: "clamp(1.75rem, 3.4vw, 2.5rem)", lineHeight: 1.2 }}
-                >
-                  {APPLY.title}
-                </h2>
-                <p
-                  className="text-content-brand-secondary tracking-tight-2"
-                  style={{ fontSize: "clamp(1.75rem, 3.4vw, 2.5rem)", lineHeight: 1.2 }}
-                >
-                  {APPLY.subtitle}
-                </p>
-              </div>
+              <h2
+                className="text-content-brand tracking-tight-2"
+                style={{ fontSize: "clamp(1.75rem, 3.4vw, 2.5rem)", lineHeight: 1.2 }}
+              >
+                {APPLY.heading}
+              </h2>
               <p
-                className="text-[18px] text-content-brand tracking-tight-2"
-                style={{ lineHeight: "24px" }}
+                className="text-[20px] text-content-brand tracking-tight-2"
+                style={{ lineHeight: "28px" }}
               >
                 {APPLY.body}
               </p>

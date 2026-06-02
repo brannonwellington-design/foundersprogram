@@ -92,7 +92,7 @@ export type Mentor = {
 export const MENTORS: Mentor[] = [
   {
     name: "Alfred Wahlforss",
-    role: "Co-Founder at Listen Labs",
+    role: "CEO & Co-Founder, Listen Labs",
     bio: "Runs immersive sessions on how decisions around fundraising, hiring, and product roadmap actually get made inside one of the fastest moving startups",
     image: "/images/mentor-alfred.png",
   },
@@ -104,7 +104,7 @@ export const MENTORS: Mentor[] = [
   },
   {
     name: "Florian Juengermann",
-    role: "Co-Founder at Listen Labs",
+    role: "CTO & Co-Founder, Listen Labs",
     bio: "Brings deep perspective as a technical founder on building a product that customers love and how to develop the instincts to get you there faster",
     image: "/images/mentor-florian.png",
   },
@@ -153,8 +153,7 @@ export const TESTIMONIALS: Testimonial[] = [
 ];
 
 export const APPLY = {
-  title: "Ready to build the next $100B company?",
-  subtitle: "Apply now to the founding cohort.",
+  heading: "Apply now to the founding cohort.",
   body: "We encourage applications from technical builders across a wide range of backgrounds, disciplines, and experience levels. Strong candidates have experience building software systems and are excited to speak with customers.",
   cta: "Apply Now",
 };

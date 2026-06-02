@@ -19,6 +19,33 @@ export function HeroImage({ className }: { className?: string }) {
   const [active, setActive] = useState(Math.floor(count / 2));
   const frame = useRef<number>(0);
   const pending = useRef<number | null>(null);
+  const ready = useRef(false);
+
+  // Preload every frame up front so switching between them is instant and never
+  // flickers an unloaded image. Interaction is gated until all are decoded.
+  useEffect(() => {
+    let cancelled = false;
+    let loaded = 0;
+    const imgs = HERO_IMAGES.map((src) => {
+      const im = new Image();
+      const done = () => {
+        if (cancelled) return;
+        loaded += 1;
+        if (loaded >= count) ready.current = true;
+      };
+      im.onload = done;
+      im.onerror = done;
+      im.src = src;
+      return im;
+    });
+    return () => {
+      cancelled = true;
+      imgs.forEach((im) => {
+        im.onload = null;
+        im.onerror = null;
+      });
+    };
+  }, [count]);
 
   useEffect(() => {
     // Only track a real (fine) pointer.
@@ -26,6 +53,7 @@ export function HeroImage({ className }: { className?: string }) {
     if (!hasFinePointer) return;
 
     function onMove(e: MouseEvent) {
+      if (!ready.current) return;
       const ratio = e.clientX / window.innerWidth;
       const idx = Math.min(count - 1, Math.max(0, Math.floor(ratio * count)));
       pending.current = idx;
@@ -52,6 +80,7 @@ export function HeroImage({ className }: { className?: string }) {
     let raf = 0;
     const TILT = 35; // degrees of left/right tilt mapped across all images
     const onOrient = (e: DeviceOrientationEvent) => {
+      if (!ready.current) return;
       const gamma = e.gamma; // left/right tilt, ~ -90..90
       if (gamma == null) return;
       const clamped = Math.max(-TILT, Math.min(TILT, gamma));
@@ -133,7 +162,8 @@ function HeroFrame({
         active ? "opacity-100" : "opacity-0",
       )}
       style={{ objectPosition: "center" }}
-      loading={priority ? "eager" : "lazy"}
+      loading="eager"
+      fetchPriority={priority ? "high" : "low"}
       decoding="async"
       draggable={false}
     />
