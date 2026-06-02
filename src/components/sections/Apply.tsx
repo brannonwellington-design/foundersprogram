@@ -1,29 +1,57 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { APPLY } from "@/lib/content";
-import { Reveal } from "@/components/motion/Reveal";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ApplyButton } from "@/components/ui/ApplyButton";
 
 export function Apply() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  // The panel drifts up over the background as the section scrolls through.
+  const panelY = useTransform(scrollYProgress, [0, 1], [110, -110]);
+
   return (
-    <section className="bg-surface-primary px-4 pb-6 pt-6 md:px-6">
+    <section
+      ref={sectionRef}
+      className="bg-surface-primary px-4 pb-6 pt-6 md:px-6"
+    >
       <SectionLabel id="apply" label="Apply" />
 
-      <div className="relative mt-6 min-h-[620px] overflow-hidden md:min-h-[760px]">
-        {/* Full-bleed background photo (CSS background — always paints, no JS). */}
+      {/* Mobile: 800px tall, full-bleed edge-to-edge (cancel the section's px-4).
+          Desktop: inset within the section, 760px tall. */}
+      <div className="relative -mx-4 mt-6 min-h-[800px] overflow-hidden md:mx-0 md:min-h-[760px]">
+        {/* Full-bleed background photo (CSS background — always paints). */}
         <div
           aria-hidden
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url(/images/apply-bg.webp)" }}
         />
 
-        {/* Card: inset 24px; bottom-aligned on mobile (photo shows above),
-            full-height left column on desktop (photo shows to the right). */}
-        <div className="relative flex min-h-[620px] items-end p-4 md:min-h-[760px] md:items-stretch md:p-6">
-          <Reveal
+        {/* Panel: parallaxes up over the photo on mobile; static left column on
+            desktop. Bottom-aligned on mobile, full-height on desktop. */}
+        <div className="relative flex min-h-[800px] items-end p-4 md:min-h-[760px] md:items-stretch md:p-6">
+          <motion.div
+            style={{ y: isMobile ? panelY : undefined }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5 }}
             className="flex w-full max-w-[572px] flex-col self-end md:self-stretch"
-            amount={0.2}
           >
             <div className="flex flex-1 flex-col justify-between gap-12 bg-surface-primary p-6">
               <div className="flex flex-col gap-2">
@@ -48,9 +76,8 @@ export function Apply() {
               </p>
             </div>
 
-            {/* CTA bar */}
             <ApplyButton fill size="lg" label={APPLY.cta} />
-          </Reveal>
+          </motion.div>
         </div>
       </div>
     </section>

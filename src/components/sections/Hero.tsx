@@ -25,7 +25,7 @@ export function Hero() {
           On desktop the grid repositions them: title top-left, lead bottom-left,
           image spanning the full-height right column.
         */}
-        <div className="flex flex-1 flex-col gap-8 md:grid md:grid-cols-2 md:grid-rows-[auto_1fr] md:gap-x-6 md:gap-y-0">
+        <div className="flex flex-1 flex-col gap-4 md:grid md:grid-cols-2 md:grid-rows-[auto_1fr] md:gap-x-6 md:gap-y-0">
           {/* Pill (desktop only, above the title) + title */}
           <motion.div
             variants={staggerContainer(0.12, 0.05)}

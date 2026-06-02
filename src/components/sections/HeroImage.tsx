@@ -44,6 +44,58 @@ export function HeroImage({ className }: { className?: string }) {
     };
   }, [count]);
 
+  // Touch devices: scrub through the images by tilting the phone left↔right
+  // (device gyroscope). iOS requires a permission prompt on first tap.
+  useEffect(() => {
+    if (window.matchMedia("(pointer: fine)").matches) return;
+
+    let raf = 0;
+    const TILT = 35; // degrees of left/right tilt mapped across all images
+    const onOrient = (e: DeviceOrientationEvent) => {
+      const gamma = e.gamma; // left/right tilt, ~ -90..90
+      if (gamma == null) return;
+      const clamped = Math.max(-TILT, Math.min(TILT, gamma));
+      const idx = Math.round(((clamped + TILT) / (TILT * 2)) * (count - 1));
+      pending.current = idx;
+      if (!frame.current) {
+        frame.current = requestAnimationFrame(() => {
+          frame.current = 0;
+          if (pending.current !== null) setActive(pending.current);
+        });
+      }
+    };
+
+    const start = () => window.addEventListener("deviceorientation", onOrient);
+
+    type DOE = typeof DeviceOrientationEvent & {
+      requestPermission?: () => Promise<"granted" | "denied">;
+    };
+    const DOEvent =
+      typeof DeviceOrientationEvent !== "undefined"
+        ? (DeviceOrientationEvent as DOE)
+        : undefined;
+
+    let onFirstTap: (() => void) | undefined;
+    if (DOEvent && typeof DOEvent.requestPermission === "function") {
+      // iOS 13+: must request after a user gesture.
+      onFirstTap = () => {
+        DOEvent.requestPermission?.()
+          .then((res) => res === "granted" && start())
+          .catch(() => {});
+        if (onFirstTap) window.removeEventListener("touchend", onFirstTap);
+      };
+      window.addEventListener("touchend", onFirstTap, { once: true });
+    } else if (DOEvent) {
+      start();
+    }
+
+    return () => {
+      window.removeEventListener("deviceorientation", onOrient);
+      if (onFirstTap) window.removeEventListener("touchend", onFirstTap);
+      if (frame.current) cancelAnimationFrame(frame.current);
+    };
+  }, [count]);
+
   return (
     <div className={cn("relative overflow-hidden bg-surface-secondary", className)}>
       {HERO_IMAGES.map((src, i) => (

@@ -22,7 +22,7 @@ export const NAV_LINKS = [
  * yet falls back to the default portrait, so the hero never breaks.
  */
 export const HERO_IMAGES = Array.from(
-  { length: 9 },
+  { length: 10 },
   (_, i) => `/images/hero/hero-${i + 1}.webp`,
 );
 export const HERO_IMAGE_FALLBACK = "/images/hero-portrait.webp";

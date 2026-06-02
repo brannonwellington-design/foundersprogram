@@ -81,16 +81,16 @@ export function Testimonials() {
 
 function MobileAttribution({ testimonial: t }: { testimonial: Testimonial }) {
   return (
-    // Shown on any device without a hovering cursor (phones AND touch tablets),
-    // where the cursor-following card can't work.
-    <div className="flex items-stretch gap-4 fine:hidden">
+    // Always shown except on desktop-with-mouse (where the cursor card is used).
+    // Gating on `md AND fine` avoids phones that misreport pointer capability.
+    <div className="flex items-stretch gap-4 md:fine:hidden">
       <Figure
         src={t.image}
         alt={t.name}
         name={t.name}
         variant="duotone"
         blendImage={false}
-        className="h-[176px] max-w-[280px] flex-1"
+        className="h-[176px] flex-1"
       />
       <div
         className="flex flex-1 flex-col justify-center text-center text-[14px] tracking-tight-2"
@@ -115,7 +115,7 @@ function CursorCard({
   const t = active !== null ? TESTIMONIALS[active] : null;
   return (
     <motion.div
-      className="pointer-events-none fixed left-0 top-0 z-30 hidden w-[224px] fine:block"
+      className="pointer-events-none fixed left-0 top-0 z-30 hidden w-[224px] md:fine:block"
       style={{ x: sx, y: sy, translateX: "24px", translateY: "-50%" }}
       aria-hidden
     >

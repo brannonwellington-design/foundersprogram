@@ -66,9 +66,9 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
     <motion.li
       variants={fade}
       transition={springSoft}
-      // Mobile: each card spans 8/12 columns and alternates left/right to make a
-      // staggered staircase (per Figma). Resets to the 2-col grid at md.
-      className="col-span-8 [&:nth-child(even)]:col-start-5 md:col-auto"
+      // Mobile only: each card spans 8/12 columns and alternates left/right for a
+      // staggered staircase (per Figma). At md+ it returns to the even 2-col grid.
+      className="max-md:col-span-8 max-md:[&:nth-child(even)]:col-start-5"
     >
       <Magnetic factor={0.12}>
         <motion.div
