@@ -24,6 +24,17 @@ export function Edge() {
   });
   const headlineY = useTransform(scrollYProgress, [0, 1], [70, -70]);
 
+  // Desktop (fine pointer) gets the cursor trail; touch gets the scroll scrub.
+  const [fine, setFine] = useState<boolean | null>(null);
+  useEffect(() => {
+    setFine(window.matchMedia("(pointer: fine)").matches);
+    // Preload all device photos so neither mode flickers.
+    LISTENING_DEVICES.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   return (
     <section
       ref={sectionRef}
@@ -59,14 +70,13 @@ export function Edge() {
           />
         </motion.div>
 
-        {/* Oversized headline overlapping the image.
-            Mobile: 3 lines, left-aligned, over the top of the image.
-            Desktop: one line, centered, edge-to-edge, vertically centered.
-            Inner element carries the scroll parallax (separate from the
-            positioning transforms on the wrapper to avoid transform conflicts). */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 -translate-y-[10%] md:left-1/2 md:right-auto md:top-1/2 md:w-screen md:-translate-x-1/2 md:-translate-y-1/2">
+        {/* Oversized headline, centered over the image, overlapping in front.
+            Mobile: 3 lines (wraps within the image width). Desktop: one line,
+            edge-to-edge. Inner element carries the scroll parallax (kept off the
+            positioning wrapper to avoid transform conflicts). */}
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2 md:left-1/2 md:right-auto md:w-screen md:-translate-x-1/2">
           <motion.h2
-            className="text-left text-[clamp(3.25rem,24vw,7rem)] leading-[0.92] text-content-brand tracking-tight-2 md:whitespace-nowrap md:text-center md:text-[clamp(2.5rem,10.2vw,12rem)] md:leading-none"
+            className="text-center text-[clamp(3.25rem,24vw,7rem)] leading-[0.92] text-content-brand tracking-tight-2 md:whitespace-nowrap md:text-[clamp(2.5rem,10.2vw,12rem)] md:leading-none"
             style={{ y: headlineY }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -76,35 +86,14 @@ export function Edge() {
             {EDGE.title}
           </motion.h2>
         </div>
+
+        {/* Mobile: the rotating device frame, tucked lower-left of the image. */}
+        {fine === false && <DeviceScrub sectionRef={sectionRef} />}
       </div>
 
-      <DeviceShowcase sectionRef={sectionRef} />
+      {/* Desktop: cursor image-trail across the whole section. */}
+      {fine === true && <DeviceTrail sectionRef={sectionRef} />}
     </section>
-  );
-}
-
-/** Picks the desktop cursor trail or the mobile scroll-scrub based on pointer. */
-function DeviceShowcase({
-  sectionRef,
-}: {
-  sectionRef: React.RefObject<HTMLElement | null>;
-}) {
-  const [fine, setFine] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setFine(window.matchMedia("(pointer: fine)").matches);
-    // Preload all device photos so neither mode flickers.
-    LISTENING_DEVICES.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []);
-
-  if (fine === null) return null;
-  return fine ? (
-    <DeviceTrail sectionRef={sectionRef} />
-  ) : (
-    <DeviceScrub sectionRef={sectionRef} />
   );
 }
 
@@ -193,8 +182,10 @@ function DeviceScrub({
   }, [scrollYProgress]);
 
   return (
+    // Positioned relative to the central image: tucked lower-left so it doesn't
+    // fight the centered headline or the portrait.
     <div
-      className="pointer-events-none absolute right-3 top-[34%] z-20 w-[40%] max-w-[190px]"
+      className="pointer-events-none absolute bottom-[6%] left-[4%] z-20 w-[36%] max-w-[150px]"
       aria-hidden
     >
       <div className="relative aspect-[800/1062] w-full">

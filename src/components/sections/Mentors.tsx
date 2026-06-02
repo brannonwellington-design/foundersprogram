@@ -5,7 +5,6 @@ import { MENTORS, MENTORS_INTRO, type Mentor } from "@/lib/content";
 import { springSoft } from "@/lib/motion";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Figure } from "@/components/ui/Figure";
-import { Magnetic } from "@/components/motion/Magnetic";
 
 const rise = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 
@@ -62,44 +61,38 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
       // staggered staircase (per Figma). At md+ it returns to the even 2-col grid.
       className="max-md:col-span-8 max-md:[&:nth-child(even)]:col-start-5"
     >
-      <Magnetic factor={0.1}>
-        <div className="group flex flex-col gap-4">
-          {/* Image, then attribution, then bio — each cascades in on its own.
-              On hover the photo slowly zooms within its frame. */}
-          <motion.div {...casc(0)}>
-            <Figure
-              src={mentor.image}
-              alt={mentor.name}
-              name={mentor.name}
-              variant="duotone"
-              blendImage={false}
-              className="aspect-square w-full"
-              imgClassName="transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
-            />
+      {/* Hover: a graceful zoom of the photo within its frame — nothing else
+          moves. */}
+      <div className="group flex flex-col gap-4">
+        <motion.div {...casc(0)}>
+          <Figure
+            src={mentor.image}
+            alt={mentor.name}
+            name={mentor.name}
+            variant="duotone"
+            blendImage={false}
+            className="aspect-square w-full"
+            imgClassName="transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
+          />
+        </motion.div>
+        <div className="flex flex-col gap-2">
+          <motion.div
+            className="flex flex-col text-[18px] tracking-tight-2"
+            style={{ lineHeight: "24px" }}
+            {...casc(0.1)}
+          >
+            <span className="text-content-brand">{mentor.name}</span>
+            <span className="text-content-brand-secondary">{mentor.role}</span>
           </motion.div>
-          <div className="flex flex-col gap-2">
-            <motion.div
-              className="flex flex-col text-[18px] tracking-tight-2"
-              style={{ lineHeight: "24px" }}
-              {...casc(0.1)}
-            >
-              <span className="relative inline-block w-fit text-content-brand">
-                {mentor.name}
-                {/* underline draws in on hover */}
-                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-content-brand transition-transform duration-500 ease-out group-hover:scale-x-100" />
-              </span>
-              <span className="text-content-brand-secondary">{mentor.role}</span>
-            </motion.div>
-            <motion.p
-              className="text-[14px] text-content-brand tracking-tight-2"
-              style={{ lineHeight: "20px" }}
-              {...casc(0.2)}
-            >
-              {mentor.bio}
-            </motion.p>
-          </div>
+          <motion.p
+            className="text-[14px] text-content-brand tracking-tight-2"
+            style={{ lineHeight: "20px" }}
+            {...casc(0.2)}
+          >
+            {mentor.bio}
+          </motion.p>
         </div>
-      </Magnetic>
+      </div>
     </li>
   );
 }

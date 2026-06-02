@@ -116,7 +116,7 @@ export const MENTORS: Mentor[] = [
   },
   {
     name: "Mike Vernal",
-    role: "Partner, Sequoia",
+    role: "Partner, Conviction",
     bio: "Previously reported directly to Mark Zuckerberg at Facebook, where he ran core product",
     image: "/images/mentor-mike.png",
   },
