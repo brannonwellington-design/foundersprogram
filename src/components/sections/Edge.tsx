@@ -5,6 +5,7 @@ import {
   AnimatePresence,
   motion,
   useScroll,
+  useTransform,
   type MotionValue,
 } from "motion/react";
 import { EDGE, LISTENING_DEVICES } from "@/lib/content";
@@ -15,6 +16,13 @@ import { cn } from "@/lib/cn";
 
 export function Edge() {
   const sectionRef = useRef<HTMLElement>(null);
+
+  // Scroll parallax for the oversized headline.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const headlineY = useTransform(scrollYProgress, [0, 1], [70, -70]);
 
   return (
     <section
@@ -51,16 +59,23 @@ export function Edge() {
           />
         </motion.div>
 
-        <motion.h2
-          className="pointer-events-none absolute left-1/2 top-1/2 z-10 w-screen -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center text-content-brand tracking-tight-2"
-          style={{ fontSize: "clamp(2.5rem, 10.2vw, 12rem)", lineHeight: 1 }}
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={springSoft}
-        >
-          {EDGE.title}
-        </motion.h2>
+        {/* Oversized headline overlapping the image.
+            Mobile: 3 lines, left-aligned, over the top of the image.
+            Desktop: one line, centered, edge-to-edge, vertically centered.
+            Inner element carries the scroll parallax (separate from the
+            positioning transforms on the wrapper to avoid transform conflicts). */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 -translate-y-[10%] md:left-1/2 md:right-auto md:top-1/2 md:w-screen md:-translate-x-1/2 md:-translate-y-1/2">
+          <motion.h2
+            className="text-left text-[clamp(3.25rem,24vw,7rem)] leading-[0.92] text-content-brand tracking-tight-2 md:whitespace-nowrap md:text-center md:text-[clamp(2.5rem,10.2vw,12rem)] md:leading-none"
+            style={{ y: headlineY }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={springSoft}
+          >
+            {EDGE.title}
+          </motion.h2>
+        </div>
       </div>
 
       <DeviceShowcase sectionRef={sectionRef} />

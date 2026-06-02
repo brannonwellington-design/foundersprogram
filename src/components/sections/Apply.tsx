@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import {
+  motion,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react";
 import { APPLY } from "@/lib/content";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ApplyButton } from "@/components/ui/ApplyButton";
@@ -25,10 +31,32 @@ export function Apply() {
   // The panel drifts up over the background as the section scrolls through.
   const panelY = useTransform(scrollYProgress, [0, 1], [110, -110]);
 
+  // Background image parallax: drifts with the cursor (mouse) and scroll while
+  // the container stays put, so the photo feels alive within its frame.
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const bgX = useSpring(mx, { stiffness: 90, damping: 22, mass: 0.8 });
+  const bgY = useSpring(my, { stiffness: 90, damping: 22, mass: 0.8 });
+  const bgScrollY = useTransform(scrollYProgress, [0, 1], [-36, 36]);
+
+  function onMouseMove(e: React.MouseEvent) {
+    const el = sectionRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    mx.set(((e.clientX - (r.left + r.width / 2)) / r.width) * -56);
+    my.set(((e.clientY - (r.top + r.height / 2)) / r.height) * -56);
+  }
+  function onMouseLeave() {
+    mx.set(0);
+    my.set(0);
+  }
+
   return (
     <section
       ref={sectionRef}
       data-hide-apply-bar
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
       className="bg-surface-primary px-4 pb-6 pt-6 md:px-6"
     >
       <SectionLabel id="apply" label="Apply" />
@@ -36,12 +64,14 @@ export function Apply() {
       {/* Mobile: 800px tall, full-bleed edge-to-edge (cancel the section's px-4).
           Desktop: inset within the section, 760px tall. */}
       <div className="relative -mx-4 mt-6 min-h-[800px] overflow-hidden md:mx-0 md:min-h-[760px]">
-        {/* Full-bleed background photo (CSS background — always paints). */}
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url(/images/apply-bg.webp)" }}
-        />
+        {/* Full-bleed background photo. Oversized and parallaxed (scroll on the
+            outer, cursor on the inner) within the clipped, still container. */}
+        <motion.div aria-hidden className="absolute -inset-[10%]" style={{ y: bgScrollY }}>
+          <motion.div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ x: bgX, y: bgY, backgroundImage: "url(/images/apply-bg.webp)" }}
+          />
+        </motion.div>
 
         {/* Panel: parallaxes up over the photo on mobile; static left column on
             desktop. Bottom-aligned on mobile, full-height on desktop. */}

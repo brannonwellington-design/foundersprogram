@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { MENTORS, MENTORS_INTRO, type Mentor } from "@/lib/content";
-import { springSoft, OVERSHOOT_SCALE } from "@/lib/motion";
+import { springSoft } from "@/lib/motion";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Figure } from "@/components/ui/Figure";
 import { Magnetic } from "@/components/motion/Magnetic";
@@ -62,13 +62,10 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
       // staggered staircase (per Figma). At md+ it returns to the even 2-col grid.
       className="max-md:col-span-8 max-md:[&:nth-child(even)]:col-start-5"
     >
-      <Magnetic factor={0.12}>
-        <motion.div
-          whileHover={{ scale: OVERSHOOT_SCALE }}
-          transition={springSoft}
-          className="flex flex-col gap-4"
-        >
-          {/* Image, then attribution, then bio — each cascades in on its own. */}
+      <Magnetic factor={0.1}>
+        <div className="group flex flex-col gap-4">
+          {/* Image, then attribution, then bio — each cascades in on its own.
+              On hover the photo slowly zooms within its frame. */}
           <motion.div {...casc(0)}>
             <Figure
               src={mentor.image}
@@ -77,6 +74,7 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
               variant="duotone"
               blendImage={false}
               className="aspect-square w-full"
+              imgClassName="transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
             />
           </motion.div>
           <div className="flex flex-col gap-2">
@@ -85,7 +83,11 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
               style={{ lineHeight: "24px" }}
               {...casc(0.1)}
             >
-              <span className="text-content-brand">{mentor.name}</span>
+              <span className="relative inline-block w-fit text-content-brand">
+                {mentor.name}
+                {/* underline draws in on hover */}
+                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-content-brand transition-transform duration-500 ease-out group-hover:scale-x-100" />
+              </span>
               <span className="text-content-brand-secondary">{mentor.role}</span>
             </motion.div>
             <motion.p
@@ -96,7 +98,7 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
               {mentor.bio}
             </motion.p>
           </div>
-        </motion.div>
+        </div>
       </Magnetic>
     </li>
   );

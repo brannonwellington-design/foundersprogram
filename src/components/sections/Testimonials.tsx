@@ -93,7 +93,7 @@ function MobileAttribution({ testimonial: t }: { testimonial: Testimonial }) {
         className="h-[176px] flex-1"
       />
       <div
-        className="flex flex-1 flex-col justify-center text-center text-[14px] tracking-tight-2"
+        className="flex flex-1 flex-col justify-center text-left text-[14px] tracking-tight-2"
         style={{ lineHeight: "20px" }}
       >
         <span className="text-content-brand">{t.name}</span>
@@ -138,7 +138,7 @@ function CursorCard({
               className="aspect-square w-full"
             />
             <div
-              className="flex flex-col text-center text-[14px] tracking-tight-2"
+              className="flex flex-col text-left text-[14px] tracking-tight-2"
               style={{ lineHeight: "20px" }}
             >
               <span className="text-content-brand">{t.name}</span>
