@@ -2,11 +2,12 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
+import { Wordmark } from "@/components/ui/Wordmark";
 
 /**
- * The closing statement: the exact "Listen" wordmark from Figma, stretched to
- * full width and locked 24px from the left, right, and bottom edges. It scales
- * and lifts into place as the footer enters the viewport.
+ * The closing statement: the "Listen" wordmark as a true inline SVG vector,
+ * stretched to full width and locked 24px from the left, right, and bottom.
+ * It scales and lifts into place as the footer enters the viewport.
  */
 export function Footer() {
   const ref = useRef<HTMLElement>(null);
@@ -20,17 +21,10 @@ export function Footer() {
   const opacity = useTransform(scrollYProgress, [0, 0.6], [0.3, 1]);
 
   return (
-    <footer ref={ref} className="px-6 pb-6 pt-[12vh]">
-      <motion.img
-        src="/images/listen-wordmark.png"
-        alt="Listen"
-        style={{ scale, y, opacity }}
-        className="block w-full origin-bottom-left select-none"
-        // Native aspect ratio (1464 × 436) keeps height correct at any width.
-        width={1464}
-        height={436}
-        draggable={false}
-      />
+    <footer ref={ref} className="px-6 pb-6 pt-[12vh] text-content-brand">
+      <motion.div style={{ scale, y, opacity }} className="origin-bottom-left">
+        <Wordmark ariaLabel="Listen" className="w-full" />
+      </motion.div>
     </footer>
   );
 }

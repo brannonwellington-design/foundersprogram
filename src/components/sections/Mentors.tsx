@@ -12,15 +12,15 @@ export function Mentors() {
     <section className="bg-surface-primary px-4 pb-24 pt-6 md:px-6">
       <SectionLabel id="mentors" label="Mentors" />
 
-      {/* 6-column grid; the intro and cards occupy the middle 4 columns
-          (one empty column indented on each side). */}
-      <div className="mt-24 md:grid md:grid-cols-6 md:gap-x-6">
+      {/* 12-column grid: intro uses 4 of the left 6 columns (cols 1–4);
+          the mentor cards occupy the right 6 columns (cols 7–12). */}
+      <div className="mt-24 md:grid md:grid-cols-12 md:gap-x-6">
         <motion.div
           variants={staggerContainer(0.1)}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.5 }}
-          className="flex flex-col gap-2 md:col-span-4 md:col-start-2"
+          className="flex flex-col gap-2 md:col-span-4 md:col-start-1 lg:sticky lg:top-24 lg:self-start"
         >
           <motion.h2
             variants={fade}
@@ -33,7 +33,7 @@ export function Mentors() {
           <motion.p
             variants={fade}
             transition={springSoft}
-            className="max-w-[472px] text-content-brand-secondary text-[20px] tracking-tight-2"
+            className="text-content-brand-secondary text-[20px] tracking-tight-2"
             style={{ lineHeight: 1.4 }}
           >
             {MENTORS_INTRO.body}
@@ -45,7 +45,7 @@ export function Mentors() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.12 }}
-          className="mt-16 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:col-span-4 md:col-start-2"
+          className="mt-16 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:col-span-6 md:col-start-7 md:mt-0"
         >
           {MENTORS.map((m) => (
             <MentorCard key={m.name} mentor={m} />

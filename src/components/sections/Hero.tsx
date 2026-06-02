@@ -67,7 +67,7 @@ export function Hero() {
             variants={staggerContainer(0.1, 0.25)}
             initial="hidden"
             animate="visible"
-            className="flex max-w-[472px] flex-col gap-6 pb-2 md:col-start-1 md:row-start-2 md:self-end md:pb-8"
+            className="flex max-w-[472px] flex-col gap-6 pb-2 md:col-start-1 md:row-start-2 md:self-end md:pb-0"
           >
             <motion.p
               variants={lineUp}

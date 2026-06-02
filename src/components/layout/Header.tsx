@@ -7,17 +7,20 @@ import { NAV_LINKS } from "@/lib/content";
 import { spring, springSnappy, staggerContainer } from "@/lib/motion";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { ApplyButton } from "@/components/ui/ApplyButton";
-import { cn } from "@/lib/cn";
 
 /**
- * Sticky top navigation. 68px tall on desktop. Inverts to the brand-blue
- * background (with contrast text/logo) while it overlaps a section marked
- * `data-nav-invert` — i.e. the blue Details section — for a seamless transition.
+ * Sticky top navigation (68px on desktop).
+ *
+ * Color "wipe": a brand-blue copy of the bar sits on top of the default cream
+ * bar and is revealed by a clip-path tied to scroll position. As a section
+ * marked `data-nav-invert` (the blue Details section) slides up behind the nav,
+ * the blue copy is unmasked exactly along the section's edge — so the nav, logo,
+ * and links flip color along the same line, like a wipe rather than a fade.
  */
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [invert, setInvert] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   // Lock body scroll while the mobile menu is open.
   useEffect(() => {
@@ -36,34 +39,46 @@ export function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Invert the nav while a `data-nav-invert` section sits behind it.
+  // Drive the blue overlay's clip from the position of invert sections.
   useEffect(() => {
     const targets = Array.from(
       document.querySelectorAll<HTMLElement>("[data-nav-invert]"),
     );
-    if (!targets.length) return;
+    const overlay = overlayRef.current;
+    const header = headerRef.current;
+    if (!overlay || !header || !targets.length) return;
 
     let raf = 0;
-    const check = () => {
+    const update = () => {
       raf = 0;
-      const header = headerRef.current;
-      const line = header ? header.getBoundingClientRect().height / 2 : 34;
-      let on = false;
+      const H = header.getBoundingClientRect().height;
+      let top = 0;
+      let bottom = 0;
+      let found = false;
       for (const el of targets) {
         const r = el.getBoundingClientRect();
-        if (r.top <= line && r.bottom > line) {
-          on = true;
+        const t = Math.max(0, Math.min(H, r.top));
+        const b = Math.max(0, Math.min(H, r.bottom));
+        if (b > t) {
+          top = t;
+          bottom = b;
+          found = true;
           break;
         }
       }
-      setInvert(on);
+      // inset(top right bottom left): reveal only the band of the nav that has
+      // a blue section behind it; collapse fully when there's none.
+      overlay.style.clipPath = found
+        ? `inset(${top}px 0 ${H - bottom}px 0)`
+        : "inset(0 0 100% 0)";
     };
+
     const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(check);
+      if (!raf) raf = requestAnimationFrame(update);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    check();
+    update();
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
@@ -72,37 +87,22 @@ export function Header() {
   }, []);
 
   return (
-    <header
-      ref={headerRef}
-      className={cn(
-        "sticky top-0 z-50 transition-colors duration-500",
-        invert
-          ? "bg-surface-brand-primary text-content-brand-contrast"
-          : "bg-surface-primary text-content-brand",
-      )}
-    >
-      <div className="flex h-14 items-center justify-between px-4 md:h-[68px] md:px-6">
-        <a href="#top" aria-label="Listen — home" className="text-current">
-          <Wordmark ariaLabel="Listen" className="h-5" />
-        </a>
+    <header ref={headerRef} className="sticky top-0 z-50">
+      <div className="relative">
+        {/* Base bar: cream background, brand-colored content. */}
+        <div className="bg-surface-primary text-content-brand">
+          <Bar onOpen={() => setOpen(true)} open={open} />
+        </div>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {NAV_LINKS.map((link) => (
-            <NavLink key={link.href} href={link.href} label={link.label} />
-          ))}
-        </nav>
-
-        {/* Mobile control */}
-        <button
-          type="button"
-          aria-label="Open menu"
-          aria-expanded={open}
-          onClick={() => setOpen(true)}
-          className="text-current md:hidden"
+        {/* Blue overlay: identical bar, revealed by the clip-path wipe. */}
+        <div
+          ref={overlayRef}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-surface-brand-primary text-content-brand-contrast"
+          style={{ clipPath: "inset(0 0 100% 0)" }}
         >
-          <Menu size={24} strokeWidth={2} />
-        </button>
+          <Bar decorative />
+        </div>
       </div>
 
       <AnimatePresence>
@@ -112,17 +112,54 @@ export function Header() {
   );
 }
 
-function NavLink({ href, label }: { href: string; label: string }) {
+/** The bar row, rendered for both the base and the (decorative) blue overlay. */
+function Bar({
+  onOpen,
+  decorative,
+}: {
+  onOpen?: () => void;
+  open?: boolean;
+  decorative?: boolean;
+}) {
   return (
-    <a
-      href={href}
-      className="group relative text-[14px] text-current tracking-tight-2"
-      style={{ lineHeight: "20px" }}
-    >
-      {label}
-      {/* Underline draws from the left on hover. */}
-      <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100" />
-    </a>
+    <div className="flex h-14 items-center justify-between px-4 md:h-[68px] md:px-6">
+      <a
+        href={decorative ? undefined : "#top"}
+        aria-label={decorative ? undefined : "Listen — home"}
+        className="text-current"
+        tabIndex={decorative ? -1 : undefined}
+      >
+        <Wordmark ariaLabel={decorative ? undefined : "Listen"} className="h-5 w-auto" />
+      </a>
+
+      {/* Desktop nav */}
+      <nav className="hidden items-center gap-8 md:flex">
+        {NAV_LINKS.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            tabIndex={decorative ? -1 : undefined}
+            className="group relative text-[14px] text-current tracking-tight-2"
+            style={{ lineHeight: "20px" }}
+          >
+            {link.label}
+            <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100" />
+          </a>
+        ))}
+      </nav>
+
+      {/* Mobile control */}
+      <button
+        type="button"
+        aria-label="Open menu"
+        aria-hidden={decorative}
+        tabIndex={decorative ? -1 : undefined}
+        onClick={decorative ? undefined : onOpen}
+        className="text-current md:hidden"
+      >
+        <Menu size={24} strokeWidth={2} />
+      </button>
+    </div>
   );
 }
 
@@ -137,7 +174,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
     >
       <div className="flex h-14 items-center justify-between px-4">
         <span className="text-content-brand">
-          <Wordmark ariaLabel="Listen" className="h-5" />
+          <Wordmark ariaLabel="Listen" className="h-5 w-auto" />
         </span>
         <button
           type="button"
