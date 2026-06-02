@@ -20,7 +20,7 @@ export function Mentors() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.5 }}
-          className="flex flex-col gap-2 md:col-span-4 md:col-start-1 lg:sticky lg:top-24 lg:self-start"
+          className="flex flex-col gap-2 md:col-span-4 md:col-start-2 lg:sticky lg:top-24 lg:self-start"
         >
           <motion.h2
             variants={fade}
@@ -45,7 +45,7 @@ export function Mentors() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.12 }}
-          className="mt-16 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:col-span-6 md:col-start-7 md:mt-0"
+          className="mt-16 grid grid-cols-12 gap-y-12 md:col-span-6 md:col-start-7 md:mt-0 md:grid-cols-2 md:gap-x-6"
         >
           {MENTORS.map((m) => (
             <MentorCard key={m.name} mentor={m} />
@@ -63,7 +63,13 @@ const fade = {
 
 function MentorCard({ mentor }: { mentor: Mentor }) {
   return (
-    <motion.li variants={fade} transition={springSoft}>
+    <motion.li
+      variants={fade}
+      transition={springSoft}
+      // Mobile: each card spans 8/12 columns and alternates left/right to make a
+      // staggered staircase (per Figma). Resets to the 2-col grid at md.
+      className="col-span-8 [&:nth-child(even)]:col-start-5 md:col-auto"
+    >
       <Magnetic factor={0.12}>
         <motion.div
           whileHover={{ scale: OVERSHOOT_SCALE }}

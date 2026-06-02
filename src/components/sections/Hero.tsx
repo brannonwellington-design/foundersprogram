@@ -45,7 +45,7 @@ export function Hero() {
             <motion.h1
               variants={lineUp}
               transition={springSoft}
-              className="max-w-[12ch] text-content-brand tracking-tight-2"
+              className="max-w-none text-content-brand tracking-tight-2 md:max-w-[12ch]"
               style={{ fontSize: "clamp(2.5rem, 6.4vw, 5.5rem)", lineHeight: 1.05 }}
             >
               {HERO.title}

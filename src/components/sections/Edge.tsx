@@ -19,7 +19,7 @@ export function Edge() {
   const ySecondary = useTransform(scrollYProgress, [0, 1], ["20%", "-20%"]);
 
   return (
-    <section className="bg-surface-primary px-4 pb-24 pt-0 md:px-6">
+    <section className="bg-surface-primary px-4 pb-24 pt-20 md:px-6 md:pt-0">
       <SectionLabel id="program" label="The Program" />
 
       <Reveal className="mx-auto mt-24 flex max-w-[755px] flex-col items-center gap-4 text-center">
