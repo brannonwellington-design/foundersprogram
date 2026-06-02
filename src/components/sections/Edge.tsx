@@ -47,8 +47,8 @@ export function Edge() {
           className="absolute left-1/2 top-0 h-[88%] w-[72%] -translate-x-1/2"
         >
           <Figure
-            src="/images/edge-1.png"
-            alt="Founders collaborating"
+            src="/images/edge-1.webp"
+            alt="Field engineers at a satellite array"
             className="h-full w-full"
           />
         </motion.div>
@@ -57,8 +57,8 @@ export function Edge() {
           className="absolute right-0 top-[28%] h-[44%] w-[36%] md:right-[4%]"
         >
           <Figure
-            src="/images/edge-2.png"
-            alt="A founder presenting"
+            src="/images/edge-2.webp"
+            alt="An iridescent telephone handset"
             className="h-full w-full"
           />
         </motion.div>

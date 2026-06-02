@@ -35,11 +35,11 @@ npm run build    # production build
 
 ## Images
 
-All imagery in `public/images/` is sourced directly from the Figma artboards
-(rendered via the Figma MCP server and committed here). The mentor and
-testimonial portraits are the design's brand-blue duotone treatment; the hero
-includes the "This could be you" mark; `apply-bg.png` is the cleanroom photo
-cropped out of the Apply composite.
+All imagery lives in `public/images/`. The mentor/testimonial portraits and the
+hero (rendered from the Figma artboards) are PNGs; the larger photographic art
+(`edge-1`, `edge-2`, `apply-bg`, `hero-portrait`) is stored as optimized WebP.
+The mentor and testimonial portraits carry the design's brand-blue duotone
+treatment; the hero includes the "This could be you" mark.
 
 `Figure` (`src/components/ui/Figure.tsx`) still falls back to an on-brand
 placeholder (initials for people) if any file is missing, so swapping in a

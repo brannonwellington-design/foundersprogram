@@ -63,7 +63,7 @@ export function Hero() {
             className="relative min-h-[320px] flex-1 md:col-start-2 md:row-span-2 md:row-start-1 md:min-h-0 md:self-stretch"
           >
             <Figure
-              src="/images/hero-portrait.png"
+              src="/images/hero-portrait.webp"
               alt="This could be you — a future founder"
               className="absolute inset-0 h-full w-full"
               objectPosition="center"

@@ -13,8 +13,8 @@ export function Apply() {
 
       <div className="relative mt-6 min-h-[640px] overflow-hidden p-4 md:min-h-[760px] md:p-6">
         <Figure
-          src="/images/apply-bg.png"
-          alt="The cohort at work"
+          src="/images/apply-bg.webp"
+          alt="A researcher inspecting a sample in a cleanroom"
           className="absolute inset-0 h-full w-full"
         />
 
