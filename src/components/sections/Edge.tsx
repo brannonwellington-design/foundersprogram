@@ -16,23 +16,34 @@ import { cn } from "@/lib/cn";
 
 export function Edge() {
   const sectionRef = useRef<HTMLElement>(null);
+  const mobileRef = useRef(false);
 
-  // Scroll parallax for the oversized headline.
+  // Scroll parallax for the oversized headline — stronger travel on mobile.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const headlineY = useTransform(scrollYProgress, [0, 1], [70, -70]);
+  const headlineY = useTransform(
+    scrollYProgress,
+    (v) => (0.5 - v) * (mobileRef.current ? 420 : 140),
+  );
 
   // Desktop (fine pointer) gets the cursor trail; touch gets the scroll scrub.
   const [fine, setFine] = useState<boolean | null>(null);
   useEffect(() => {
     setFine(window.matchMedia("(pointer: fine)").matches);
+    const mq = window.matchMedia("(max-width: 767px)");
+    const updateMobile = () => {
+      mobileRef.current = mq.matches;
+    };
+    updateMobile();
+    mq.addEventListener("change", updateMobile);
     // Preload all device photos so neither mode flickers.
     LISTENING_DEVICES.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
+    return () => mq.removeEventListener("change", updateMobile);
   }, []);
 
   return (
@@ -70,11 +81,10 @@ export function Edge() {
           />
         </motion.div>
 
-        {/* Oversized headline, centered over the image, overlapping in front.
-            Mobile: 3 lines (wraps within the image width). Desktop: one line,
-            edge-to-edge. Inner element carries the scroll parallax (kept off the
-            positioning wrapper to avoid transform conflicts). */}
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2 md:left-1/2 md:right-auto md:w-screen md:-translate-x-1/2">
+        {/* Oversized headline, centered over the image, overlapping in front,
+            and above the scrolling device layer (z-20). Mobile forces three
+            lines: "Listen" / "is your" / "edge". Desktop is one line. */}
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-20 -translate-y-1/2 md:left-1/2 md:right-auto md:w-screen md:-translate-x-1/2">
           <motion.h2
             className="text-center text-[clamp(3.25rem,24vw,7rem)] leading-[0.92] text-content-brand tracking-tight-2 md:whitespace-nowrap md:text-[clamp(2.5rem,10.2vw,12rem)] md:leading-none"
             style={{ y: headlineY }}
@@ -83,11 +93,14 @@ export function Edge() {
             viewport={{ once: true, amount: 0.5 }}
             transition={springSoft}
           >
-            {EDGE.title}
+            <span className="block md:inline">Listen</span>{" "}
+            <span className="block md:inline">is your</span>{" "}
+            <span className="block md:inline">edge</span>
           </motion.h2>
         </div>
 
-        {/* Mobile: the rotating device frame, tucked lower-left of the image. */}
+        {/* Mobile: the rotating device frame, 16px from the image's bottom-left,
+            beneath the headline (z-10). */}
         {fine === false && <DeviceScrub sectionRef={sectionRef} />}
       </div>
 
@@ -182,10 +195,9 @@ function DeviceScrub({
   }, [scrollYProgress]);
 
   return (
-    // Positioned relative to the central image: tucked lower-left so it doesn't
-    // fight the centered headline or the portrait.
+    // 16px from the image's bottom-left corner, beneath the headline (z-10).
     <div
-      className="pointer-events-none absolute bottom-[6%] left-[4%] z-20 w-[36%] max-w-[150px]"
+      className="pointer-events-none absolute bottom-4 left-4 z-10 w-[36%] max-w-[150px]"
       aria-hidden
     >
       <div className="relative aspect-[800/1062] w-full">
