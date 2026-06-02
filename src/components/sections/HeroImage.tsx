@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { HERO_IMAGES, HERO_IMAGE_FALLBACK } from "@/lib/content";
 import { cn } from "@/lib/cn";
 
 /**
  * Interactive hero image. The cursor's horizontal position across the page
- * selects which of the nine images is shown (far-left → first, far-right →
- * ninth), with a quick cross-fade between them. This makes the whole page feel
- * responsive to the visitor as they move left↔right.
+ * selects which image is shown (far-left → first, far-right → last), with a
+ * hard cut between them. On touch devices, tilting the phone left↔right does
+ * the same via the gyroscope.
  *
- * - No-pointer / touch devices show a default frame (no hover to track).
- * - Any missing image falls back to the default portrait, so it never breaks.
- * - Honors prefers-reduced-motion (the cross-fade transition is removed in CSS).
+ * Every frame is loaded AND decoded up front; interaction is gated until all
+ * are decode-ready, so switching is instant and never flickers a blank/partly
+ * decoded image during a transition.
  */
 export function HeroImage({ className }: { className?: string }) {
   const count = HERO_IMAGES.length;
@@ -20,37 +20,16 @@ export function HeroImage({ className }: { className?: string }) {
   const frame = useRef<number>(0);
   const pending = useRef<number | null>(null);
   const ready = useRef(false);
+  const decoded = useRef(0);
 
-  // Preload every frame up front so switching between them is instant and never
-  // flickers an unloaded image. Interaction is gated until all are decoded.
-  useEffect(() => {
-    let cancelled = false;
-    let loaded = 0;
-    const imgs = HERO_IMAGES.map((src) => {
-      const im = new Image();
-      const done = () => {
-        if (cancelled) return;
-        loaded += 1;
-        if (loaded >= count) ready.current = true;
-      };
-      im.onload = done;
-      im.onerror = done;
-      im.src = src;
-      return im;
-    });
-    return () => {
-      cancelled = true;
-      imgs.forEach((im) => {
-        im.onload = null;
-        im.onerror = null;
-      });
-    };
+  const onFrameReady = useCallback(() => {
+    decoded.current += 1;
+    if (decoded.current >= count) ready.current = true;
   }, [count]);
 
+  // Desktop: cursor X across the page selects the frame.
   useEffect(() => {
-    // Only track a real (fine) pointer.
-    const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
-    if (!hasFinePointer) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
 
     function onMove(e: MouseEvent) {
       if (!ready.current) return;
@@ -72,16 +51,14 @@ export function HeroImage({ className }: { className?: string }) {
     };
   }, [count]);
 
-  // Touch devices: scrub through the images by tilting the phone left↔right
-  // (device gyroscope). iOS requires a permission prompt on first tap.
+  // Touch devices: tilt the phone left↔right (gyroscope).
   useEffect(() => {
     if (window.matchMedia("(pointer: fine)").matches) return;
 
-    let raf = 0;
-    const TILT = 35; // degrees of left/right tilt mapped across all images
+    const TILT = 35; // degrees of tilt mapped across all frames
     const onOrient = (e: DeviceOrientationEvent) => {
       if (!ready.current) return;
-      const gamma = e.gamma; // left/right tilt, ~ -90..90
+      const gamma = e.gamma;
       if (gamma == null) return;
       const clamped = Math.max(-TILT, Math.min(TILT, gamma));
       const idx = Math.round(((clamped + TILT) / (TILT * 2)) * (count - 1));
@@ -103,24 +80,38 @@ export function HeroImage({ className }: { className?: string }) {
       typeof DeviceOrientationEvent !== "undefined"
         ? (DeviceOrientationEvent as DOE)
         : undefined;
+    if (!DOEvent) return;
 
-    let onFirstTap: (() => void) | undefined;
-    if (DOEvent && typeof DOEvent.requestPermission === "function") {
-      // iOS 13+: must request after a user gesture.
-      onFirstTap = () => {
+    let grant: (() => void) | undefined;
+    if (typeof DOEvent.requestPermission === "function") {
+      // iOS requires a user gesture before motion access; grant on the first
+      // interaction of any kind.
+      const events: (keyof WindowEventMap)[] = [
+        "touchend",
+        "pointerdown",
+        "click",
+      ];
+      grant = () => {
         DOEvent.requestPermission?.()
           .then((res) => res === "granted" && start())
           .catch(() => {});
-        if (onFirstTap) window.removeEventListener("touchend", onFirstTap);
+        events.forEach((ev) => window.removeEventListener(ev, grant!));
       };
-      window.addEventListener("touchend", onFirstTap, { once: true });
-    } else if (DOEvent) {
+      events.forEach((ev) =>
+        window.addEventListener(ev, grant!, { once: true, passive: true }),
+      );
+    } else {
+      // Android etc.: no permission needed.
       start();
     }
 
     return () => {
       window.removeEventListener("deviceorientation", onOrient);
-      if (onFirstTap) window.removeEventListener("touchend", onFirstTap);
+      if (grant) {
+        (["touchend", "pointerdown", "click"] as (keyof WindowEventMap)[]).forEach(
+          (ev) => window.removeEventListener(ev, grant!),
+        );
+      }
       if (frame.current) cancelAnimationFrame(frame.current);
     };
   }, [count]);
@@ -128,7 +119,13 @@ export function HeroImage({ className }: { className?: string }) {
   return (
     <div className={cn("relative overflow-hidden bg-surface-secondary", className)}>
       {HERO_IMAGES.map((src, i) => (
-        <HeroFrame key={src} src={src} alt="" active={i === active} priority={i === active} />
+        <HeroFrame
+          key={src}
+          src={src}
+          active={i === active}
+          priority={i === active}
+          onReady={onFrameReady}
+        />
       ))}
       <span className="sr-only">Listen — future founders</span>
     </div>
@@ -137,21 +134,45 @@ export function HeroImage({ className }: { className?: string }) {
 
 function HeroFrame({
   src,
-  alt,
   active,
   priority,
+  onReady,
 }: {
   src: string;
-  alt: string;
   active: boolean;
   priority: boolean;
+  onReady: () => void;
 }) {
+  const ref = useRef<HTMLImageElement>(null);
   const [resolvedSrc, setResolvedSrc] = useState(src);
+
+  // Force a full decode up front so the first paint of this frame (when it
+  // becomes active) doesn't flicker.
+  useEffect(() => {
+    const img = ref.current;
+    if (!img) return;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      onReady();
+    };
+    const decode = () => img.decode().then(finish).catch(finish);
+    if (img.complete && img.naturalWidth > 0) {
+      decode();
+    } else {
+      img.addEventListener("load", decode, { once: true });
+      img.addEventListener("error", finish, { once: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={ref}
       src={resolvedSrc}
-      alt={alt}
+      alt=""
       aria-hidden={!active}
       onError={() => {
         if (resolvedSrc !== HERO_IMAGE_FALLBACK) setResolvedSrc(HERO_IMAGE_FALLBACK);

@@ -31,7 +31,7 @@ export function Hero() {
             variants={staggerContainer(0.12, 0.05)}
             initial="hidden"
             animate="visible"
-            className="flex flex-col items-start gap-6 pt-6 md:col-start-1 md:row-start-1 md:self-start md:pt-8"
+            className="flex flex-col items-start gap-4 pt-6 md:col-start-1 md:row-start-1 md:self-start md:pt-8"
           >
             <motion.span
               variants={lineUp}

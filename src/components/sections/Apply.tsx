@@ -62,8 +62,8 @@ export function Apply() {
                 {APPLY.heading}
               </h2>
               <p
-                className="text-[20px] text-content-brand tracking-tight-2"
-                style={{ lineHeight: "28px" }}
+                className="text-[16px] text-content-brand tracking-tight-2 md:text-[20px]"
+                style={{ lineHeight: 1.4 }}
               >
                 {APPLY.body}
               </p>

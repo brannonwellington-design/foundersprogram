@@ -22,38 +22,27 @@ export function MobileApplyBar() {
   const anchorRef = useRef<HTMLAnchorElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Show after the hero, hide at the apply/footer.
+  // Always present (including the hero), but hide once the Apply section and
+  // footer — which carry their own CTA — come into view.
   useEffect(() => {
-    const hero = document.getElementById("top");
     const enders = Array.from(
       document.querySelectorAll<HTMLElement>("[data-hide-apply-bar]"),
     );
-    let heroVisible = true;
+    if (!enders.length) {
+      setShow(true);
+      return;
+    }
     const endVisible = new Set<Element>();
-    const compute = () => setShow(!heroVisible && endVisible.size === 0);
-
-    const heroObs = new IntersectionObserver(
-      ([e]) => {
-        heroVisible = e.isIntersecting;
-        compute();
-      },
-      { threshold: 0 },
-    );
-    if (hero) heroObs.observe(hero);
-
     const endObs = new IntersectionObserver((entries) => {
       for (const en of entries) {
         if (en.isIntersecting) endVisible.add(en.target);
         else endVisible.delete(en.target);
       }
-      compute();
+      setShow(endVisible.size === 0);
     });
     enders.forEach((el) => endObs.observe(el));
-
-    return () => {
-      heroObs.disconnect();
-      endObs.disconnect();
-    };
+    setShow(true);
+    return () => endObs.disconnect();
   }, []);
 
   // Reverse wipe over the blue Details section.

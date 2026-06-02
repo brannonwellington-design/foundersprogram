@@ -2,10 +2,23 @@
 
 import { motion } from "motion/react";
 import { MENTORS, MENTORS_INTRO, type Mentor } from "@/lib/content";
-import { springSoft, staggerContainer, OVERSHOOT_SCALE } from "@/lib/motion";
+import { springSoft, OVERSHOOT_SCALE } from "@/lib/motion";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Figure } from "@/components/ui/Figure";
 import { Magnetic } from "@/components/motion/Magnetic";
+
+const rise = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
+
+/** Reveals on scroll-in with a staggered delay (seconds). */
+function casc(delay: number) {
+  return {
+    variants: rise,
+    initial: "hidden" as const,
+    whileInView: "visible" as const,
+    viewport: { once: true, amount: 0.4 },
+    transition: { ...springSoft, delay },
+  };
+}
 
 export function Mentors() {
   return (
@@ -15,57 +28,36 @@ export function Mentors() {
       {/* 12-column grid: intro uses 4 of the left 6 columns (cols 1–4);
           the mentor cards occupy the right 6 columns (cols 7–12). */}
       <div className="mt-24 md:grid md:grid-cols-12 md:gap-x-6">
-        <motion.div
-          variants={staggerContainer(0.1)}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.5 }}
-          className="flex flex-col gap-2 md:col-span-4 md:col-start-2 lg:sticky lg:top-24 lg:self-start"
-        >
+        <div className="flex flex-col gap-2 md:col-span-4 md:col-start-2 lg:sticky lg:top-24 lg:self-start">
           <motion.h2
-            variants={fade}
-            transition={springSoft}
             className="text-content-brand tracking-tight-2"
             style={{ fontSize: "clamp(2rem, 3.4vw, 2.5rem)", lineHeight: 1.2 }}
+            {...casc(0)}
           >
             {MENTORS_INTRO.title}
           </motion.h2>
           <motion.p
-            variants={fade}
-            transition={springSoft}
             className="text-content-brand-secondary text-[20px] tracking-tight-2"
             style={{ lineHeight: 1.4 }}
+            {...casc(0.1)}
           >
             {MENTORS_INTRO.body}
           </motion.p>
-        </motion.div>
+        </div>
 
-        <motion.ul
-          variants={staggerContainer(0.1)}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.12 }}
-          className="mt-16 grid grid-cols-12 gap-y-12 md:col-span-6 md:col-start-7 md:mt-0 md:grid-cols-2 md:gap-x-6"
-        >
+        <ul className="mt-16 grid grid-cols-12 gap-y-12 md:col-span-6 md:col-start-7 md:mt-0 md:grid-cols-2 md:gap-x-6">
           {MENTORS.map((m) => (
             <MentorCard key={m.name} mentor={m} />
           ))}
-        </motion.ul>
+        </ul>
       </div>
     </section>
   );
 }
 
-const fade = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-};
-
 function MentorCard({ mentor }: { mentor: Mentor }) {
   return (
-    <motion.li
-      variants={fade}
-      transition={springSoft}
+    <li
       // Mobile only: each card spans 8/12 columns and alternates left/right for a
       // staggered staircase (per Figma). At md+ it returns to the even 2-col grid.
       className="max-md:col-span-8 max-md:[&:nth-child(even)]:col-start-5"
@@ -76,31 +68,36 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
           transition={springSoft}
           className="flex flex-col gap-4"
         >
-          <Figure
-            src={mentor.image}
-            alt={mentor.name}
-            name={mentor.name}
-            variant="duotone"
-            blendImage={false}
-            className="aspect-square w-full"
-          />
+          {/* Image, then attribution, then bio — each cascades in on its own. */}
+          <motion.div {...casc(0)}>
+            <Figure
+              src={mentor.image}
+              alt={mentor.name}
+              name={mentor.name}
+              variant="duotone"
+              blendImage={false}
+              className="aspect-square w-full"
+            />
+          </motion.div>
           <div className="flex flex-col gap-2">
-            <div
+            <motion.div
               className="flex flex-col text-[18px] tracking-tight-2"
               style={{ lineHeight: "24px" }}
+              {...casc(0.1)}
             >
               <span className="text-content-brand">{mentor.name}</span>
               <span className="text-content-brand-secondary">{mentor.role}</span>
-            </div>
-            <p
+            </motion.div>
+            <motion.p
               className="text-[14px] text-content-brand tracking-tight-2"
               style={{ lineHeight: "20px" }}
+              {...casc(0.2)}
             >
               {mentor.bio}
-            </p>
+            </motion.p>
           </div>
         </motion.div>
       </Magnetic>
-    </motion.li>
+    </li>
   );
 }
