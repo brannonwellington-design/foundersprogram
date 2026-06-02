@@ -104,25 +104,25 @@ export const MENTORS: Mentor[] = [
   },
   {
     name: "Mar Hershenson",
-    role: "Partner at Pear VC, Professor at Stanford Business School",
+    role: "Partner, Pear VC, Professor at Stanford Business School",
     bio: "One of the sharpest minds on idea generation and early-stage company building",
     image: "/images/mentor-mar.png",
   },
   {
     name: "Mike Vernal",
-    role: "Partner at Sequoia",
+    role: "Partner, Sequoia",
     bio: "Previously reported directly to Mark Zuckerberg at Facebook, where he ran core product",
     image: "/images/mentor-mike.png",
   },
   {
     name: "Konstantine Buhler",
-    role: "Partner at Sequoia",
+    role: "Partner, Sequoia",
     bio: "Deep experience in early-stage company building, fundraising strategy, and what separates fundable from fundable-and-great",
     image: "/images/mentor-konstantine.png",
   },
   {
     name: "Nick Shalek",
-    role: "Partner at Ribbit Capital",
+    role: "Partner, Ribbit Capital",
     bio: "Has seen firsthand what it takes to move from initial traction to a machine that scales and what kills companies in between",
     image: "/images/mentor-nick.png",
   },
@@ -140,14 +140,14 @@ export const TESTIMONIALS: Testimonial[] = [
     quote:
       "“Working at Listen has been pretty remarkable. My favorite part is how transparent Alfred and Florian are. I get to see firsthand how decisions around fundraising, hiring, and product roadmap actually get made.”",
     name: "Krish Mehta",
-    role: "Founding Engineer at Listen Labs",
+    role: "Founding Engineer, Listen Labs",
     image: "/images/testimonial-krish.png",
   },
   {
     quote:
       "“Since I talk to so many different customers, I’m constantly seeing new business problems and coming up with new ideas. We’ve gone zero to one, and I’ve learned what it means to not just to build, but how to sell, think about product, and solve deep technical problems.”",
     name: "Ollie Elmgren",
-    role: "Engineer at Listen Labs",
+    role: "Engineer, Listen Labs",
     image: "/images/testimonial-ollie.png",
   },
 ];
