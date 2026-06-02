@@ -16,6 +16,17 @@ export const NAV_LINKS = [
   { label: "Apply", href: "#apply" },
 ] as const;
 
+/**
+ * Hero images cycled by cursor position (left→right maps to 1→9).
+ * Drop the nine exports in public/images/hero/. Any slot that isn't present
+ * yet falls back to the default portrait, so the hero never breaks.
+ */
+export const HERO_IMAGES = Array.from(
+  { length: 9 },
+  (_, i) => `/images/hero/hero-${i + 1}.webp`,
+);
+export const HERO_IMAGE_FALLBACK = "/images/hero-portrait.webp";
+
 export const HERO = {
   title: "Listen Future Founder Program",
   pill: "Accepting Applications",

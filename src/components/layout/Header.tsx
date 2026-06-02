@@ -7,7 +7,6 @@ import { NAV_LINKS } from "@/lib/content";
 import { spring, springSnappy, staggerContainer } from "@/lib/motion";
 import { Logo } from "@/components/ui/Logo";
 import { ApplyButton } from "@/components/ui/ApplyButton";
-import { ThemeToggle } from "@/components/motion/ThemeToggle";
 
 /**
  * Top bar: logo, inline nav (desktop) or a hamburger that morphs into a
@@ -46,12 +45,10 @@ export function Header() {
           {NAV_LINKS.map((link) => (
             <NavLink key={link.href} href={link.href} label={link.label} />
           ))}
-          <ThemeToggle className="ml-2" />
         </nav>
 
         {/* Mobile controls */}
         <div className="flex items-center gap-4 md:hidden">
-          <ThemeToggle />
           <button
             type="button"
             aria-label="Open menu"

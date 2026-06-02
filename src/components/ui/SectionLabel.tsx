@@ -27,23 +27,23 @@ export function SectionLabel({
     <div
       id={id}
       className={cn(
-        "flex items-center gap-6 text-[14px] tracking-tight-2 scroll-mt-24",
+        "flex w-full items-center gap-6 text-[14px] tracking-tight-2 scroll-mt-24",
         color,
         className,
       )}
       style={{ lineHeight: "20px" }}
     >
       <span className="shrink-0 whitespace-nowrap">{label}</span>
-      <span className="relative h-px flex-1 overflow-hidden">
-        <motion.span
-          className="absolute inset-0 block origin-left"
-          style={{ backgroundColor: "currentColor", opacity: 0.4 }}
+      <div className="relative h-px min-w-0 flex-1">
+        <motion.div
+          className="absolute inset-0 origin-left"
+          style={{ backgroundColor: "currentColor", opacity: 0.55 }}
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={springSoft}
         />
-      </span>
+      </div>
       <span className="shrink-0 whitespace-nowrap text-right">{label}</span>
     </div>
   );

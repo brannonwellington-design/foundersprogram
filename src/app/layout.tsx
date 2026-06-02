@@ -24,25 +24,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f9f4eb" },
-    { media: "(prefers-color-scheme: dark)", color: "#130f06" },
-  ],
+  themeColor: "#f9f4eb",
 };
-
-/* Set the theme before first paint to avoid a flash. Reads a saved choice,
-   otherwise falls back to the OS preference. */
-const noFlashTheme = `
-(function () {
-  try {
-    var saved = localStorage.getItem("theme");
-    var system = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", saved || system);
-  } catch (e) {
-    document.documentElement.setAttribute("data-theme", "light");
-  }
-})();
-`;
 
 export default function RootLayout({
   children,
@@ -50,10 +33,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: noFlashTheme }} />
-      </head>
+    // Light mode only for now. The dark tokens remain in globals.css and the
+    // ThemeToggle component is kept, so dark mode can be re-enabled later.
+    <html lang="en" className={inter.variable} data-theme="light">
       <body>
         <SmoothScroll>{children}</SmoothScroll>
       </body>

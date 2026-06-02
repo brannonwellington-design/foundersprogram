@@ -2,12 +2,11 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
-import { Logo } from "@/components/ui/Logo";
 
 /**
- * The closing statement: an oversized "Listen" wordmark that scales and lifts
- * into place as the footer enters the viewport. Scale contrast as the primary
- * compositional tool, per the brand's art direction.
+ * The closing statement: the exact "Listen" wordmark from Figma, stretched to
+ * full width and locked 24px from the left, right, and bottom edges. It scales
+ * and lifts into place as the footer enters the viewport.
  */
 export function Footer() {
   const ref = useRef<HTMLElement>(null);
@@ -16,21 +15,22 @@ export function Footer() {
     offset: ["start end", "end end"],
   });
 
-  const scale = useTransform(scrollYProgress, [0, 1], [0.86, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [60, 0]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [0.4, 1]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.92, 1]);
+  const y = useTransform(scrollYProgress, [0, 1], [40, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.6], [0.3, 1]);
 
   return (
-    <footer
-      ref={ref}
-      className="flex min-h-[60vh] items-end overflow-hidden px-4 pb-6 md:px-6"
-    >
-      <motion.div
-        style={{ scale, y, opacity, fontSize: "34vw" }}
-        className="w-full origin-bottom-left text-content-brand"
-      >
-        <Logo label="Listen" className="block w-full leading-[0.8]" />
-      </motion.div>
+    <footer ref={ref} className="px-6 pb-6 pt-[12vh]">
+      <motion.img
+        src="/images/listen-wordmark.png"
+        alt="Listen"
+        style={{ scale, y, opacity }}
+        className="block w-full origin-bottom-left select-none"
+        // Native aspect ratio (1464 × 436) keeps height correct at any width.
+        width={1464}
+        height={436}
+        draggable={false}
+      />
     </footer>
   );
 }

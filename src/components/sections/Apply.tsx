@@ -16,6 +16,7 @@ export function Apply() {
           src="/images/apply-bg.webp"
           alt="A researcher inspecting a sample in a cleanroom"
           className="absolute inset-0 h-full w-full"
+          objectPosition="center right"
         />
 
         <Reveal

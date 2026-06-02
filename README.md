@@ -18,7 +18,17 @@ Colors, typography, spacing, and iconography follow the **Listen Labs brand
 plugin** (Paper theme). Tokens live as CSS variables in
 `src/app/globals.css`; light is the default and `[data-theme="dark"]` overrides
 the same token names, so the whole site re-themes without touching components.
-A light/dark toggle is in the header.
+
+The site is **light-mode only** for now (`<html data-theme="light">`). The dark
+tokens and the `ThemeToggle` component remain in the codebase, so dark mode can
+be re-enabled by restoring the toggle and the no-flash theme script.
+
+### Interactive hero
+
+The hero image responds to the cursor: horizontal position across the page
+maps left→right to nine images (`public/images/hero/hero-1.webp` …
+`hero-9.webp`). Missing slots fall back to `hero-portrait.webp`, so it never
+breaks. See `src/components/sections/HeroImage.tsx`.
 
 - Type: **Inter 400 only** (brand rule — never bold/light)
 - Spacing: 4px base, even numbers only

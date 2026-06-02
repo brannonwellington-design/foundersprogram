@@ -6,7 +6,7 @@ import { spring, springSoft, staggerContainer } from "@/lib/motion";
 import { Marquee } from "@/components/layout/Marquee";
 import { Header } from "@/components/layout/Header";
 import { ApplyButton } from "@/components/ui/ApplyButton";
-import { Figure } from "@/components/ui/Figure";
+import { HeroImage } from "@/components/sections/HeroImage";
 
 const lineUp = {
   hidden: { opacity: 0, y: 28 },
@@ -62,12 +62,7 @@ export function Hero() {
             transition={{ ...springSoft, delay: 0.15 }}
             className="relative min-h-[320px] flex-1 md:col-start-2 md:row-span-2 md:row-start-1 md:min-h-0 md:self-stretch"
           >
-            <Figure
-              src="/images/hero-portrait.webp"
-              alt="This could be you — a future founder"
-              className="absolute inset-0 h-full w-full"
-              objectPosition="center"
-            />
+            <HeroImage className="absolute inset-0 h-full w-full" />
           </motion.div>
 
           {/* Lead + desktop CTA (pinned to the bottom of the left column) */}
