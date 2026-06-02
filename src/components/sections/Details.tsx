@@ -11,6 +11,7 @@ export function Details() {
   return (
     <section
       id="details"
+      data-nav-invert
       className="bg-surface-brand-primary px-4 pb-16 pt-6 text-content-brand-contrast md:px-6"
     >
       <SectionLabel label="Details" tone="contrast" />

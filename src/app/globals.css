@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* A device with a real hovering cursor (desktop mouse/trackpad). Used to gate
+   hover-only interactions like the cursor-following testimonial card. On touch
+   tablets/phones this is false, so we fall back to static layouts. */
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
 /*
   Listen Labs — Paper theme tokens.
   Sourced verbatim from the Listen Labs brand plugin (brand_data.py).

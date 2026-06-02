@@ -1,20 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/content";
 import { spring, springSnappy, staggerContainer } from "@/lib/motion";
-import { Logo } from "@/components/ui/Logo";
+import { Wordmark } from "@/components/ui/Wordmark";
 import { ApplyButton } from "@/components/ui/ApplyButton";
+import { cn } from "@/lib/cn";
 
 /**
- * Sticky top navigation. 68px tall on desktop. Stays pinned to the top of the
- * viewport on scroll (on both desktop and mobile). The hamburger opens a
- * full-screen menu on mobile.
+ * Sticky top navigation. 68px tall on desktop. Inverts to the brand-blue
+ * background (with contrast text/logo) while it overlaps a section marked
+ * `data-nav-invert` — i.e. the blue Details section — for a seamless transition.
  */
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [invert, setInvert] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Lock body scroll while the mobile menu is open.
   useEffect(() => {
@@ -33,11 +36,54 @@ export function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // Invert the nav while a `data-nav-invert` section sits behind it.
+  useEffect(() => {
+    const targets = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-nav-invert]"),
+    );
+    if (!targets.length) return;
+
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      const header = headerRef.current;
+      const line = header ? header.getBoundingClientRect().height / 2 : 34;
+      let on = false;
+      for (const el of targets) {
+        const r = el.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) {
+          on = true;
+          break;
+        }
+      }
+      setInvert(on);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(check);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    check();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 bg-surface-primary">
+    <header
+      ref={headerRef}
+      className={cn(
+        "sticky top-0 z-50 transition-colors duration-500",
+        invert
+          ? "bg-surface-brand-primary text-content-brand-contrast"
+          : "bg-surface-primary text-content-brand",
+      )}
+    >
       <div className="flex h-14 items-center justify-between px-4 md:h-[68px] md:px-6">
-        <a href="#top" aria-label="Listen — home" className="text-content-brand">
-          <Logo className="text-[18px]" />
+        <a href="#top" aria-label="Listen — home" className="text-current">
+          <Wordmark ariaLabel="Listen" className="h-5" />
         </a>
 
         {/* Desktop nav */}
@@ -53,7 +99,7 @@ export function Header() {
           aria-label="Open menu"
           aria-expanded={open}
           onClick={() => setOpen(true)}
-          className="text-content-brand md:hidden"
+          className="text-current md:hidden"
         >
           <Menu size={24} strokeWidth={2} />
         </button>
@@ -70,12 +116,12 @@ function NavLink({ href, label }: { href: string; label: string }) {
   return (
     <a
       href={href}
-      className="group relative text-[14px] text-content-brand tracking-tight-2"
+      className="group relative text-[14px] text-current tracking-tight-2"
       style={{ lineHeight: "20px" }}
     >
       {label}
       {/* Underline draws from the left on hover. */}
-      <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-content-brand transition-transform duration-300 ease-out group-hover:scale-x-100" />
+      <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100" />
     </a>
   );
 }
@@ -83,15 +129,15 @@ function NavLink({ href, label }: { href: string; label: string }) {
 function MobileMenu({ onClose }: { onClose: () => void }) {
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col bg-surface-primary md:hidden"
+      className="fixed inset-0 z-50 flex flex-col bg-surface-primary text-content-brand md:hidden"
       initial={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
       animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
       exit={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
       transition={spring}
     >
       <div className="flex h-14 items-center justify-between px-4">
-        <span className="text-[18px] text-content-brand">
-          <Logo />
+        <span className="text-content-brand">
+          <Wordmark ariaLabel="Listen" className="h-5" />
         </span>
         <button
           type="button"

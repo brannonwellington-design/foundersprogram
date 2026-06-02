@@ -76,7 +76,8 @@ function HeroFrame({
         if (resolvedSrc !== HERO_IMAGE_FALLBACK) setResolvedSrc(HERO_IMAGE_FALLBACK);
       }}
       className={cn(
-        "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out",
+        // Hard cut between frames (no fade) for a crisp, responsive feel.
+        "absolute inset-0 h-full w-full object-cover",
         active ? "opacity-100" : "opacity-0",
       )}
       style={{ objectPosition: "center" }}
