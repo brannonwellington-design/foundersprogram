@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+/*
+  Listen Labs — Paper theme tokens.
+  Sourced verbatim from the Listen Labs brand plugin (brand_data.py).
+  Light is the default; [data-theme="dark"] overrides the same token names,
+  so the whole site re-themes without touching a single component.
+*/
+
+:root,
+[data-theme="light"] {
+  /* Content */
+  --content-primary: #120f08;
+  --content-secondary: #6b6861;
+  --content-inverse-primary: #f9f4eb;
+  --content-inverse-secondary: #9e9b94;
+  --content-disabled: #b6b4af;
+  --content-inverse-disabled: #504e49;
+  --content-brand: #0021cc;
+  --content-brand-secondary: #7a85b8;
+  --content-brand-contrast: #f9f4eb;
+  --content-brand-contrast-secondary: #9ca3c9;
+  --content-complimentary: #b88114;
+  --content-warning: #b85814;
+  --content-negative: #b82214;
+  --content-positive: #0f8a38;
+
+  /* Surface */
+  --surface-highlight: #fbf9f4;
+  --surface-primary: #f9f4eb;
+  --surface-secondary: #eee8dd;
+  --surface-tertiary: #e2dccf;
+  --surface-inverse-primary: #120f08;
+  --surface-inverse-secondary: #1f1b14;
+  --surface-brand-primary: #0021cc;
+  --surface-brand-secondary: #d9ddf2;
+
+  /* Hero "This could be you" accent disc (art element from the design). */
+  --hero-accent: #e8412b;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  /* Content */
+  --content-primary: #f9f4eb;
+  --content-secondary: #9e9b94;
+  --content-inverse-primary: #120f08;
+  --content-inverse-secondary: #6b6861;
+  --content-disabled: #504e49;
+  --content-inverse-disabled: #b6b4af;
+  --content-brand: #3354ff;
+  --content-brand-secondary: #7a85b8;
+  --content-brand-contrast: #f9f4eb;
+  --content-brand-contrast-secondary: #9ca3c9;
+  --content-complimentary: #b88114;
+  --content-warning: #b85814;
+  --content-negative: #b82214;
+  --content-positive: #0f8a38;
+
+  /* Surface */
+  --surface-highlight: #080603;
+  --surface-primary: #130f06;
+  --surface-secondary: #201c13;
+  --surface-tertiary: #30291d;
+  --surface-inverse-primary: #f9f4eb;
+  --surface-inverse-secondary: #f0e9db;
+  --surface-brand-primary: #0021cc;
+  --surface-brand-secondary: #131939;
+
+  --hero-accent: #e8412b;
+
+  color-scheme: dark;
+}
+
+/* Expose tokens to Tailwind v4 as utilities (bg-surface-primary, text-content-brand, …).
+   `inline` keeps the utilities referencing the live vars, so theme switching works. */
+@theme inline {
+  --color-content-primary: var(--content-primary);
+  --color-content-secondary: var(--content-secondary);
+  --color-content-inverse-primary: var(--content-inverse-primary);
+  --color-content-inverse-secondary: var(--content-inverse-secondary);
+  --color-content-disabled: var(--content-disabled);
+  --color-content-brand: var(--content-brand);
+  --color-content-brand-secondary: var(--content-brand-secondary);
+  --color-content-brand-contrast: var(--content-brand-contrast);
+  --color-content-brand-contrast-secondary: var(--content-brand-contrast-secondary);
+  --color-content-positive: var(--content-positive);
+  --color-content-negative: var(--content-negative);
+
+  --color-surface-highlight: var(--surface-highlight);
+  --color-surface-primary: var(--surface-primary);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-tertiary: var(--surface-tertiary);
+  --color-surface-inverse-primary: var(--surface-inverse-primary);
+  --color-surface-inverse-secondary: var(--surface-inverse-secondary);
+  --color-surface-brand-primary: var(--surface-brand-primary);
+  --color-surface-brand-secondary: var(--surface-brand-secondary);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Even-number spacing scale already matches Tailwind's 4px base. */
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--surface-primary);
+    color: var(--content-primary);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400; /* Brand rule: Inter Regular only — never bold, never light. */
+    transition: background-color 0.6s ease, color 0.6s ease;
+  }
+
+  /* Brand rule: never override letter-spacing globally; headings use a tight
+     optical tracking that mirrors the Figma type styles only where specified. */
+  ::selection {
+    background-color: var(--content-brand);
+    color: var(--content-brand-contrast);
+  }
+}
+
+@layer utilities {
+  /* Tight tracking values pulled from the Figma type styles (−0.02em ≈ −2% per brand). */
+  .tracking-tight-2 {
+    letter-spacing: -0.02em;
+  }
+
+  /* Hairline used between section labels and as the row dividers in Details. */
+  .hairline {
+    height: 1px;
+    background-color: currentColor;
+    opacity: 0.35;
+  }
+}
+
+/* Honor reduced-motion: kill transforms/animation but keep content fully visible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
