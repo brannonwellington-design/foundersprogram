@@ -33,35 +33,20 @@ npm run dev      # http://localhost:3000
 npm run build    # production build
 ```
 
-## Images — action needed
+## Images
 
-The Figma image assets could not be pulled into this environment automatically
-(the network policy blocks `figma.com`). The site renders today with on-brand
-placeholders (initials for people) that **automatically swap to the real photo
-the moment the file exists** — no code change required.
+All imagery in `public/images/` is sourced directly from the Figma artboards
+(rendered via the Figma MCP server and committed here). The mentor and
+testimonial portraits are the design's brand-blue duotone treatment; the hero
+includes the "This could be you" mark; `apply-bg.png` is the cleanroom photo
+cropped out of the Apply composite.
 
-Export these from Figma and drop them in `public/images/` with these exact
-names (PNG):
+`Figure` (`src/components/ui/Figure.tsx`) still falls back to an on-brand
+placeholder (initials for people) if any file is missing, so swapping in a
+higher-resolution export later is a drop-in replacement using the same name.
 
-| File | Used for |
-|------|----------|
-| `hero-portrait.png` | Hero photo (behind the "This could be you" disc) |
-| `edge-1.png` | "Listen is your edge" — main image |
-| `edge-2.png` | "Listen is your edge" — small offset image |
-| `mentor-alfred.png` | Alfred Wahlforss |
-| `mentor-mar.png` | Mar Hershenson |
-| `mentor-florian.png` | Florian Juengermann |
-| `mentor-mike.png` | Mike Vernal |
-| `mentor-konstantine.png` | Konstantine Buhler |
-| `mentor-nick.png` | Nick Shalek |
-| `testimonial-krish.png` | Krish Mehta |
-| `testimonial-ollie.png` | Ollie Elmgren |
-| `apply-bg.png` | Apply section background |
-
-The mentor/testimonial images get the design's brand-blue + `mix-blend-screen`
-duotone treatment automatically.
-
-Alternatively, push the exports to a GitHub location and I can wire them in.
+`scripts/extract-images.cjs` documents how the images were decoded from the
+Figma renders (one-off; not part of the build).
 
 ## Structure
 

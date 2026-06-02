@@ -76,6 +76,7 @@ function MobileAttribution({ testimonial: t }: { testimonial: Testimonial }) {
         alt={t.name}
         name={t.name}
         variant="duotone"
+        blendImage={false}
         className="h-[176px] flex-1"
       />
       <div
@@ -120,6 +121,7 @@ function CursorCard({
               alt={t.name}
               name={t.name}
               variant="duotone"
+              blendImage={false}
               className="aspect-square w-full"
             />
             <div

@@ -75,6 +75,7 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
             alt={mentor.name}
             name={mentor.name}
             variant="duotone"
+            blendImage={false}
             className="aspect-square w-full"
           />
           <div className="flex flex-col gap-2">

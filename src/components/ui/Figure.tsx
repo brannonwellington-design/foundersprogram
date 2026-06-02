@@ -22,6 +22,7 @@ export function Figure({
   className,
   imgClassName,
   objectPosition,
+  blendImage = true,
 }: {
   src: string;
   alt: string;
@@ -31,6 +32,12 @@ export function Figure({
   className?: string;
   imgClassName?: string;
   objectPosition?: string;
+  /**
+   * Whether to apply mix-blend-screen to the loaded image (duotone only).
+   * Set false when the source image is already a composited duotone export,
+   * so we keep the brand-blue fallback plate but don't blend twice.
+   */
+  blendImage?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -82,7 +89,7 @@ export function Figure({
           onError={() => setFailed(true)}
           className={cn(
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
-            isDuotone && "mix-blend-screen",
+            isDuotone && blendImage && "mix-blend-screen",
             loaded ? "opacity-100" : "opacity-0",
             imgClassName,
           )}

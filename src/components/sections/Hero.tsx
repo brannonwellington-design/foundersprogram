@@ -64,11 +64,10 @@ export function Hero() {
           >
             <Figure
               src="/images/hero-portrait.png"
-              alt="A founder at work"
+              alt="This could be you — a future founder"
               className="absolute inset-0 h-full w-full"
-              objectPosition="center 20%"
+              objectPosition="center"
             />
-            <FloatingMark />
           </motion.div>
 
           {/* Lead + desktop CTA (pinned to the bottom of the left column) */}
@@ -100,30 +99,5 @@ export function Hero() {
         </div>
       </div>
     </section>
-  );
-}
-
-/** The red "This could be you" disc, gently drifting. */
-function FloatingMark() {
-  return (
-    <motion.div
-      className="pointer-events-none absolute left-1/2 top-1/2 flex items-center justify-center rounded-full"
-      style={{
-        width: "min(40%, 252px)",
-        aspectRatio: "1 / 1",
-        backgroundColor: "var(--hero-accent)",
-        x: "-50%",
-        y: "-50%",
-      }}
-      animate={{ y: ["-52%", "-48%", "-52%"], x: "-50%" }}
-      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-    >
-      <span
-        className="px-4 text-center text-[16px] md:text-[18px]"
-        style={{ color: "var(--content-inverse-primary)", lineHeight: 1.3 }}
-      >
-        {HERO.circle}
-      </span>
-    </motion.div>
   );
 }
