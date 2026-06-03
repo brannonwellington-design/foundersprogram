@@ -66,7 +66,6 @@ export function HeroImage({ className }: { className?: string }) {
 
     const TILT = 35; // degrees of tilt mapped across all frames
     const onOrient = (e: DeviceOrientationEvent) => {
-      if (!ready.current) return;
       const gamma = e.gamma;
       if (gamma == null) return;
       const clamped = Math.max(-TILT, Math.min(TILT, gamma));
@@ -91,37 +90,33 @@ export function HeroImage({ className }: { className?: string }) {
         : undefined;
     if (!DOEvent) return;
 
-    let grant: (() => void) | undefined;
-    if (typeof DOEvent.requestPermission === "function") {
-      // iOS requires a user gesture before motion access; grant on the first
-      // interaction of any kind.
-      const events: (keyof WindowEventMap)[] = [
-        "touchend",
-        "pointerdown",
-        "click",
-      ];
-      grant = () => {
-        DOEvent.requestPermission?.()
-          .then((res) => res === "granted" && start())
-          .catch(() => {});
-        events.forEach((ev) => window.removeEventListener(ev, grant!));
-      };
-      events.forEach((ev) =>
-        window.addEventListener(ev, grant!, { once: true, passive: true }),
-      );
-    } else {
-      // Android etc.: no permission needed.
+    if (typeof DOEvent.requestPermission !== "function") {
+      // Android etc.: no permission needed, attach immediately.
       start();
+      return () => window.removeEventListener("deviceorientation", onOrient);
     }
+
+    // iOS: requestPermission must run inside a user gesture. Use touchend/click
+    // (which reliably trigger the prompt — NOT pointerdown), once.
+    let requested = false;
+    const request = () => {
+      if (requested) return;
+      requested = true;
+      DOEvent.requestPermission?.()
+        .then((res) => {
+          if (res === "granted") start();
+        })
+        .catch(() => {});
+      window.removeEventListener("touchend", request);
+      window.removeEventListener("click", request);
+    };
+    window.addEventListener("touchend", request);
+    window.addEventListener("click", request);
 
     return () => {
       window.removeEventListener("deviceorientation", onOrient);
-      if (grant) {
-        (["touchend", "pointerdown", "click"] as (keyof WindowEventMap)[]).forEach(
-          (ev) => window.removeEventListener(ev, grant!),
-        );
-      }
-      if (frame.current) cancelAnimationFrame(frame.current);
+      window.removeEventListener("touchend", request);
+      window.removeEventListener("click", request);
     };
   }, [count]);
 
