@@ -2,14 +2,27 @@
 
 import { motion } from "motion/react";
 import { HERO } from "@/lib/content";
-import { spring, springSoft, staggerContainer } from "@/lib/motion";
+import { easeOutExpo, fadeRise, maskRise, springSoft } from "@/lib/motion";
 import { ApplyButton } from "@/components/ui/ApplyButton";
 import { HeroImage } from "@/components/sections/HeroImage";
 
-const lineUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0 },
+/**
+ * One shared entrance timeline (seconds). Everything is choreographed off
+ * these so the hero loads as a single composed sequence rather than a set of
+ * independent fades: the image curtain drops first, the pill and title words
+ * cascade up out of it, then the lead and CTA settle in last.
+ */
+const T = {
+  image: 0.05,
+  pill: 0.2,
+  title: 0.32,
+  titleStep: 0.08,
+  lead: 0.66,
+  button: 0.78,
 };
+
+/** Title split into rising word-masks; "Founder Program" stays on one line. */
+const TITLE_WORDS = ["Listen", "Future", "Founder Program"];
 
 export function Hero() {
   return (
@@ -26,61 +39,83 @@ export function Hero() {
           image spanning the full-height right column.
         */}
         <div className="flex flex-1 flex-col gap-4 md:grid md:grid-cols-2 md:grid-rows-[auto_1fr] md:gap-x-6 md:gap-y-0">
-          {/* Pill (desktop only, above the title) + title */}
+          {/* Pill (desktop only, above the title) + title.
+              `animate="visible"` propagates the named state down to the masked
+              word-spans; each one carries its own staggered delay via `custom`. */}
           <motion.div
-            variants={staggerContainer(0.12, 0.05)}
             initial="hidden"
             animate="visible"
             className="flex flex-col items-start gap-4 pt-6 md:col-start-1 md:row-start-1 md:self-start md:pt-8"
           >
             <motion.span
-              variants={lineUp}
-              transition={springSoft}
+              variants={fadeRise}
+              custom={T.pill}
               className="hidden items-center rounded-[40px] border border-content-brand px-[10px] py-1 text-[14px] text-content-brand tracking-tight-2 md:inline-flex"
               style={{ lineHeight: "20px" }}
             >
               {HERO.pill}
             </motion.span>
 
-            <motion.h1
-              variants={lineUp}
-              transition={springSoft}
+            <h1
               className="max-w-none text-content-brand tracking-tight-2"
               style={{ fontSize: "clamp(2.5rem, 5.6vw, 5.5rem)", lineHeight: 1.05 }}
             >
-              {/* Keep "Founder Program" on one line (non-breaking space). */}
-              {HERO.title.replace("Founder Program", "Founder\u00A0Program")}
-            </motion.h1>
+              {TITLE_WORDS.map((word, i) => (
+                // Static clip; the inner span slides up from behind its edge.
+                // The padding/negative-margin pair keeps descenders (g, p) from
+                // being shaved by overflow-hidden without altering layout.
+                <span
+                  key={word}
+                  className="inline-block overflow-hidden pb-[0.14em] -mb-[0.14em] align-bottom"
+                  style={{ marginRight: i < TITLE_WORDS.length - 1 ? "0.25em" : 0 }}
+                >
+                  <motion.span
+                    className="inline-block"
+                    variants={maskRise}
+                    custom={T.title + i * T.titleStep}
+                  >
+                    {word}
+                  </motion.span>
+                </span>
+              ))}
+            </h1>
           </motion.div>
 
-          {/* Interactive hero image — starts immediately under the nav. */}
+          {/* Interactive hero image — drops in behind a top-down clip-path
+              "curtain" while easing out of a slight zoom, so it reveals rather
+              than fades. */}
           <motion.div
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ ...springSoft, delay: 0.15 }}
-            className="relative h-[52vh] w-full md:col-start-2 md:row-span-2 md:row-start-1 md:h-auto md:self-stretch"
+            initial={{ clipPath: "inset(0 0 100% 0)", scale: 1.08 }}
+            animate={{ clipPath: "inset(0 0 0% 0)", scale: 1 }}
+            transition={{
+              clipPath: { duration: 1.1, ease: easeOutExpo, delay: T.image },
+              scale: { ...springSoft, delay: T.image },
+            }}
+            className="relative h-[52vh] w-full overflow-hidden md:col-start-2 md:row-span-2 md:row-start-1 md:h-auto md:self-stretch"
           >
             <HeroImage className="absolute inset-0 h-full w-full" />
           </motion.div>
 
-          {/* Lead + desktop CTA (pinned to the bottom of the left column) */}
+          {/* Lead + desktop CTA (pinned to the bottom of the left column). */}
           <motion.div
-            variants={staggerContainer(0.1, 0.25)}
             initial="hidden"
             animate="visible"
             className="flex max-w-[472px] flex-col gap-6 pb-2 md:col-start-1 md:row-start-2 md:self-end md:pb-0"
           >
-            <motion.p
-              variants={lineUp}
-              transition={springSoft}
-              className="text-[24px] tracking-tight-2"
-              style={{ lineHeight: 1.4 }}
-            >
-              <span className="text-content-brand">{HERO.leadPrimary}</span>{" "}
-              <span className="text-content-brand-secondary">{HERO.leadSecondary}</span>
-            </motion.p>
+            {/* Whole paragraph rises as one block from behind a mask. */}
+            <div className="overflow-hidden pb-[0.12em] -mb-[0.12em]">
+              <motion.p
+                variants={maskRise}
+                custom={T.lead}
+                className="text-[24px] tracking-tight-2"
+                style={{ lineHeight: 1.4 }}
+              >
+                <span className="text-content-brand">{HERO.leadPrimary}</span>{" "}
+                <span className="text-content-brand-secondary">{HERO.leadSecondary}</span>
+              </motion.p>
+            </div>
 
-            <motion.div variants={lineUp} transition={spring} className="hidden md:block">
+            <motion.div variants={fadeRise} custom={T.button} className="hidden md:block">
               <ApplyButton />
             </motion.div>
           </motion.div>

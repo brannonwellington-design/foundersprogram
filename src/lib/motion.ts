@@ -40,6 +40,39 @@ export const reel: Transition = {
   mass: 0.9,
 };
 
+/**
+ * Premium exponential ease-out — long, decisive tail. Used for "curtain"
+ * wipes (clip-path reveals) where a spring's overshoot would look wrong.
+ */
+export const easeOutExpo = [0.16, 1, 0.3, 1] as const;
+
+/**
+ * Masked line/word reveal. The child rises from fully below its clipping
+ * parent (which MUST be `overflow-hidden`), so the text appears to slide up
+ * from behind a hard edge. `custom` is the absolute start delay in seconds,
+ * letting a row of words cascade up in sequence.
+ */
+export const maskRise: Variants = {
+  hidden: { y: "120%" },
+  visible: (delay: number = 0) => ({
+    y: "0%",
+    transition: { ...springSoft, delay },
+  }),
+};
+
+/**
+ * Soft fade + rise for elements that don't get a hard mask (pills, buttons).
+ * `custom` is the absolute start delay in seconds.
+ */
+export const fadeRise: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (delay: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { ...springSoft, delay, opacity: { duration: 0.6, delay } },
+  }),
+};
+
 /** Standard scroll-reveal: rise + fade, springy settle. */
 export const revealVariants: Variants = {
   hidden: { opacity: 0, y: 24 },
