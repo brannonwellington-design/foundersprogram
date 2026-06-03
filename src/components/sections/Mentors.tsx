@@ -29,7 +29,7 @@ export function Mentors() {
       <div className="mt-24 md:grid md:grid-cols-12 md:gap-x-6">
         <div className="flex flex-col gap-2 md:col-span-4 md:col-start-2 lg:sticky lg:top-24 lg:self-start">
           <motion.h2
-            className="text-content-brand tracking-tight-2"
+            className="text-content-brand tracking-tight-2 md:text-balance"
             style={{ fontSize: "clamp(2rem, 3.4vw, 2.5rem)", lineHeight: 1.2 }}
             {...casc(0)}
           >
