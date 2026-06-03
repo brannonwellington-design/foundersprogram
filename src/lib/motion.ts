@@ -29,15 +29,15 @@ export const springSnappy: Transition = {
 };
 
 /**
- * Clean wipe for reveal/conceal of masked content (testimonial photo on hover).
- * Slightly overdamped so the clip edge travels and settles with no overshoot or
- * wobble — the wipe reads as crisp and controlled rather than bouncy.
+ * Slot-machine reel for the testimonial photo on hover. Snappy and critically
+ * damped (no overshoot) so faces roll up through the window crisply — quick to
+ * arrive on activation, and seamless when swapping between people at speed.
  */
-export const wipe: Transition = {
+export const reel: Transition = {
   type: "spring",
-  stiffness: 260,
-  damping: 38,
-  mass: 1,
+  stiffness: 520,
+  damping: 44,
+  mass: 0.9,
 };
 
 /** Standard scroll-reveal: rise + fade, springy settle. */

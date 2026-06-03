@@ -8,7 +8,7 @@ import {
   useSpring,
 } from "motion/react";
 import { TESTIMONIALS, type Testimonial } from "@/lib/content";
-import { springSnappyOptions, wipe } from "@/lib/motion";
+import { springSnappyOptions, reel } from "@/lib/motion";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Figure } from "@/components/ui/Figure";
@@ -115,41 +115,59 @@ function CursorCard({
   const t = active !== null ? TESTIMONIALS[active] : null;
   return (
     <motion.div
-      className="pointer-events-none fixed left-0 top-0 z-30 hidden w-[224px] md:fine:block"
+      className="pointer-events-none fixed left-0 top-0 z-30 hidden w-[224px] flex-col gap-4 md:fine:flex"
       style={{ x: sx, y: sy, translateX: "24px", translateY: "-50%" }}
       aria-hidden
     >
-      <AnimatePresence>
-        {t && (
-          <motion.div
-            key={t.name}
-            // Clean bottom-up wipe (no grow, no fade): the reveal sweeps upward
-            // from the bottom edge on enter, and the same upward sweep conceals
-            // it on exit. clipPath insets are top/right/bottom/left.
-            initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
-            animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-            exit={{ clipPath: "inset(0% 0% 100% 0%)" }}
-            transition={wipe}
-            className="flex flex-col gap-4"
-          >
-            <Figure
-              src={t.image}
-              alt={t.name}
-              name={t.name}
-              variant="duotone"
-              blendImage={false}
-              className="aspect-square w-full"
-            />
-            <div
-              className="flex flex-col text-left text-[14px] tracking-tight-2"
+      {/* Photo reel: each opaque duotone plate rolls up into the window from the
+          bottom while the previous one rolls out the top. Because the plates
+          overlap and never leave a gap, rapid hops between people read as a
+          continuous slot-machine roll rather than a blank-then-repopulate. The
+          window clips the off-screen frames. */}
+      <div className="relative aspect-square w-full overflow-hidden">
+        <AnimatePresence>
+          {t && (
+            <motion.div
+              key={t.name}
+              className="absolute inset-0"
+              initial={{ y: "100%" }}
+              animate={{ y: "0%" }}
+              exit={{ y: "-100%" }}
+              transition={reel}
+            >
+              <Figure
+                src={t.image}
+                alt={t.name}
+                name={t.name}
+                variant="duotone"
+                blendImage={false}
+                className="h-full w-full"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Attribution rolls in lockstep with the photo, clipped to its own
+          two-line strip so the names swap on the same reel. */}
+      <div className="relative h-10 overflow-hidden">
+        <AnimatePresence>
+          {t && (
+            <motion.div
+              key={t.name}
+              className="absolute inset-0 flex flex-col text-left text-[14px] tracking-tight-2"
               style={{ lineHeight: "20px" }}
+              initial={{ y: "100%" }}
+              animate={{ y: "0%" }}
+              exit={{ y: "-100%" }}
+              transition={reel}
             >
               <span className="text-content-brand">{t.name}</span>
               <span className="text-content-brand-secondary">{t.role}</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }
