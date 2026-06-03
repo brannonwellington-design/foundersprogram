@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { APPLY } from "@/lib/content";
+import { asset } from "@/lib/asset";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ApplyButton } from "@/components/ui/ApplyButton";
 
@@ -40,7 +41,7 @@ export function Apply() {
         <div
           aria-hidden
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url(/images/apply-bg.webp)" }}
+          style={{ backgroundImage: `url(${asset("/images/apply-bg.webp")})` }}
         />
 
         {/* Panel: parallaxes up over the photo on mobile; static left column on

@@ -9,6 +9,7 @@ import {
   type MotionValue,
 } from "motion/react";
 import { EDGE, LISTENING_DEVICES } from "@/lib/content";
+import { asset } from "@/lib/asset";
 import { springSoft } from "@/lib/motion";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Figure } from "@/components/ui/Figure";
@@ -75,7 +76,7 @@ export function Edge() {
           transition={springSoft}
         >
           <Figure
-            src="/images/program-center.webp"
+            src={asset("/images/program-center.webp")}
             alt="A founder listening on the phone"
             className="h-full w-full"
           />

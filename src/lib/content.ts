@@ -5,6 +5,8 @@
  * "early-stage company building" typo corrected.
  */
 
+import { asset } from "@/lib/asset";
+
 export const APPLY_URL =
   "https://jobs.ashbyhq.com/listenlabs/ab4889ec-0e06-42f2-8613-57072a445a96";
 
@@ -21,11 +23,10 @@ export const NAV_LINKS = [
  * Drop the nine exports in public/images/hero/. Any slot that isn't present
  * yet falls back to the default portrait, so the hero never breaks.
  */
-export const HERO_IMAGES = Array.from(
-  { length: 10 },
-  (_, i) => `/images/hero/hero-${i + 1}.webp`,
+export const HERO_IMAGES = Array.from({ length: 10 }, (_, i) =>
+  asset(`/images/hero/hero-${i + 1}.webp`),
 );
-export const HERO_IMAGE_FALLBACK = "/images/hero-portrait.webp";
+export const HERO_IMAGE_FALLBACK = asset("/images/hero-portrait.webp");
 
 export const HERO = {
   title: "Listen Future Founder Program",
@@ -43,9 +44,8 @@ export const EDGE = {
 };
 
 /** Listening-device photos for the Program section (cursor trail / scroll scrub). */
-export const LISTENING_DEVICES = Array.from(
-  { length: 13 },
-  (_, i) => `/images/listening_device_${String(i + 1).padStart(2, "0")}.webp`,
+export const LISTENING_DEVICES = Array.from({ length: 13 }, (_, i) =>
+  asset(`/images/listening_device_${String(i + 1).padStart(2, "0")}.webp`),
 );
 
 export type Detail = { n: string; title: string; body: string };
@@ -100,37 +100,37 @@ export const MENTORS: Mentor[] = [
     name: "Alfred Wahlforss",
     role: "CEO & Co-Founder, Listen Labs",
     bio: "Runs immersive sessions on how decisions around fundraising, hiring, and product roadmap actually get made inside one of the fastest moving startups",
-    image: "/images/mentor-alfred.png",
+    image: asset("/images/mentor-alfred.png"),
   },
   {
     name: "Florian Juengermann",
     role: "CTO & Co-Founder, Listen Labs",
     bio: "Brings deep perspective as a technical founder on building a product that customers love and how to develop the instincts to get you there faster",
-    image: "/images/mentor-florian.png",
+    image: asset("/images/mentor-florian.png"),
   },
   {
     name: "Mar Hershenson",
     role: "Partner, Pear VC, Professor at Stanford Business School",
     bio: "One of the sharpest minds on idea generation and early-stage company building",
-    image: "/images/mentor-mar.png",
+    image: asset("/images/mentor-mar.png"),
   },
   {
     name: "Mike Vernal",
     role: "Partner, Conviction",
     bio: "Previously reported directly to Mark Zuckerberg at Facebook, where he ran core product",
-    image: "/images/mentor-mike.png",
+    image: asset("/images/mentor-mike.png"),
   },
   {
     name: "Konstantine Buhler",
     role: "Partner, Sequoia",
     bio: "Deep experience in early-stage company building, fundraising strategy, and what separates fundable from fundable-and-great",
-    image: "/images/mentor-konstantine.png",
+    image: asset("/images/mentor-konstantine.png"),
   },
   {
     name: "Nick Shalek",
     role: "Partner, Ribbit Capital",
     bio: "Has seen firsthand what it takes to move from initial traction to a machine that scales and what kills companies in between",
-    image: "/images/mentor-nick.png",
+    image: asset("/images/mentor-nick.png"),
   },
 ];
 
@@ -147,14 +147,14 @@ export const TESTIMONIALS: Testimonial[] = [
       "“Working at Listen has been pretty remarkable. My favorite part is how transparent Alfred and Florian are. I get to see firsthand how decisions around fundraising, hiring, and product roadmap actually get made.”",
     name: "Krish Mehta",
     role: "Founding Engineer, Listen Labs",
-    image: "/images/testimonial-krish.png",
+    image: asset("/images/testimonial-krish.png"),
   },
   {
     quote:
       "“Since I talk to so many different customers, I’m constantly seeing new business problems and coming up with new ideas. We’ve gone zero to one, and I’ve learned what it means to not just to build, but how to sell, think about product, and solve deep technical problems.”",
     name: "Ollie Elmgren",
     role: "Engineer, Listen Labs",
-    image: "/images/testimonial-ollie.png",
+    image: asset("/images/testimonial-ollie.png"),
   },
 ];
 
