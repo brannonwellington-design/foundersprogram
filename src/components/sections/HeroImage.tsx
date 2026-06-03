@@ -27,6 +27,15 @@ export function HeroImage({ className }: { className?: string }) {
     if (decoded.current >= count) ready.current = true;
   }, [count]);
 
+  // Safety net: unlock interaction even if a frame's decode() never reports
+  // back (which would otherwise leave the cursor/gyro permanently gated).
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      ready.current = true;
+    }, 900);
+    return () => window.clearTimeout(t);
+  }, []);
+
   // Desktop: cursor X across the page selects the frame.
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
