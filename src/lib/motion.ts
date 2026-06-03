@@ -28,6 +28,18 @@ export const springSnappy: Transition = {
   mass: 0.8,
 };
 
+/**
+ * Clean wipe for reveal/conceal of masked content (testimonial photo on hover).
+ * Slightly overdamped so the clip edge travels and settles with no overshoot or
+ * wobble — the wipe reads as crisp and controlled rather than bouncy.
+ */
+export const wipe: Transition = {
+  type: "spring",
+  stiffness: 260,
+  damping: 38,
+  mass: 1,
+};
+
 /** Standard scroll-reveal: rise + fade, springy settle. */
 export const revealVariants: Variants = {
   hidden: { opacity: 0, y: 24 },
