@@ -8,7 +8,7 @@ import {
   useSpring,
 } from "motion/react";
 import { TESTIMONIALS, type Testimonial } from "@/lib/content";
-import { spring, springSnappyOptions } from "@/lib/motion";
+import { springSnappyOptions, wipe } from "@/lib/motion";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Figure } from "@/components/ui/Figure";
@@ -123,10 +123,13 @@ function CursorCard({
         {t && (
           <motion.div
             key={t.name}
-            initial={{ opacity: 0, scale: 0.92, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={spring}
+            // Clean bottom-up wipe (no grow, no fade): the reveal sweeps upward
+            // from the bottom edge on enter, and the same upward sweep conceals
+            // it on exit. clipPath insets are top/right/bottom/left.
+            initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
+            animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+            exit={{ clipPath: "inset(0% 0% 100% 0%)" }}
+            transition={wipe}
             className="flex flex-col gap-4"
           >
             <Figure
