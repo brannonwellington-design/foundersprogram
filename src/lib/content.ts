@@ -160,7 +160,7 @@ export const TESTIMONIALS: Testimonial[] = [
     quote:
       "“Every Listen study is connected to a real business problem, so you’re exposed to the questions companies are trying to answer. You get to see the gaps and opportunities across different industries to inspire new ideas.”",
     name: "Diana Lim",
-    role: "Growth Engineer",
+    role: "Growth Engineer, Listen Labs",
     image: asset("/images/testimonial-diana.webp"),
   },
 ];

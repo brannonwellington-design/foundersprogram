@@ -83,14 +83,14 @@ function MobileAttribution({ testimonial: t }: { testimonial: Testimonial }) {
   return (
     // Always shown except on desktop-with-mouse (where the cursor card is used).
     // Gating on `md AND fine` avoids phones that misreport pointer capability.
-    <div className="flex items-stretch gap-4 md:fine:hidden">
+    <div className="flex items-center gap-4 md:fine:hidden">
       <Figure
         src={t.image}
         alt={t.name}
         name={t.name}
         variant="duotone"
         blendImage={false}
-        className="h-[176px] flex-1"
+        className="size-[136px] shrink-0"
       />
       <div
         className="flex flex-1 flex-col justify-center text-left text-[14px] tracking-tight-2"
