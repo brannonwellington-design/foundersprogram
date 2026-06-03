@@ -58,7 +58,7 @@ export function Apply() {
             <div className="flex flex-1 flex-col justify-between gap-12 bg-surface-primary p-6">
               <h2
                 className="text-content-brand tracking-tight-2 md:text-balance"
-                style={{ fontSize: "clamp(1.75rem, 3.4vw, 2.5rem)", lineHeight: 1.2 }}
+                style={{ fontSize: "clamp(2.25rem, 4.8vw, 3.5rem)", lineHeight: 1.15 }}
               >
                 {APPLY.heading}
               </h2>

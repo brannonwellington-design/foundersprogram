@@ -38,7 +38,8 @@ export function Marquee() {
     x.set(next);
 
     if (trackRef.current) {
-      trackRef.current.style.transform = `translate3d(${next}px,0,0)`;
+      // Snap to whole pixels — sub-pixel transforms blur the text on the GPU layer.
+      trackRef.current.style.transform = `translate3d(${Math.round(next)}px,0,0)`;
     }
   });
 
