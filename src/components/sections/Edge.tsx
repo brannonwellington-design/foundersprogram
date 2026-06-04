@@ -53,7 +53,7 @@ export function Edge() {
       {/* Headline — the first thing in the section. It scrolls in from below
           normally, then sticks pinned at the vertical center of the viewport
           (z-0, behind) while the video, body, and portrait scroll up over it. */}
-      <div className="pointer-events-none sticky top-1/2 z-0 mt-12 -translate-y-1/2">
+      <div className="pointer-events-none sticky top-1/2 z-0 mt-36 -translate-y-1/2">
         <motion.h2
           className="mx-auto max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
           style={{ fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)", lineHeight: 1.05 }}
