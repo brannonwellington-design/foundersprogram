@@ -24,10 +24,7 @@ export function Details() {
     <section
       id="details"
       data-nav-invert
-      // `relative z-10 -mt-[60vh]` pulls this section up over the Edge section's
-      // matching overlap spacer so its opaque blue background scrolls across the
-      // still-pinned Program headline (which sits at z-0 inside Edge).
-      className="relative z-10 -mt-[60vh] bg-surface-brand-primary px-4 pb-16 pt-6 text-content-brand-contrast md:px-6"
+      className="bg-surface-brand-primary px-4 pb-16 pt-6 text-content-brand-contrast md:px-6"
     >
       <SectionLabel label="Details" tone="contrast" />
 

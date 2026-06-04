@@ -41,21 +41,17 @@ export function Edge() {
   const portraitY = useTransform(portraitP, [0, 1], [110, -70]);
 
   return (
-    // `isolate` keeps the section's z-layers self-contained (so the parallax
-    // portrait paints *under* the next section). No `overflow-hidden` here —
-    // it would break the headline's sticky pin.
+    // `isolate` keeps the section's z-layers self-contained, so the parallax
+    // portrait paints *under* the next (Details) section.
     <section
       ref={sectionRef}
-      className="relative isolate bg-surface-primary px-4 pt-20 md:px-6 md:pt-16"
+      className="relative isolate bg-surface-primary px-4 pb-24 pt-20 md:px-6 md:pt-16"
     >
       <SectionLabel id="program" label="The Program" />
 
-      {/* Headline — the first thing in the section. It scrolls in from below
-          normally, then sticks pinned at the vertical center of the viewport
-          (z-0, behind) while the video, body, and portrait scroll up over it.
-          It never unpins: the spacer below keeps it pinned until the next
-          (Details) section, pulled up over it, scrolls across and covers it. */}
-      <div className="pointer-events-none sticky top-1/2 z-0 mt-[168px] -translate-y-1/2">
+      {/* Headline — the first thing in the section. It scrolls in from below,
+          then scrolls normally with the rest of the section content. */}
+      <div className="mt-16">
         <motion.h2
           className="mx-auto max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
           style={{ fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)", lineHeight: 1.05 }}
@@ -68,8 +64,8 @@ export function Edge() {
         </motion.h2>
       </div>
 
-      {/* Featured video — follows the headline, then scrolls up over it.
-          Topmost layer (z-30) so the cursor trail passes behind it. */}
+      {/* Featured video — follows the headline. Topmost layer (z-30) so the
+          cursor trail passes behind it. */}
       <motion.div
         className="relative z-30 mx-auto mt-16 w-full max-w-[720px]"
         initial={{ opacity: 0, scale: 1.02 }}
@@ -80,7 +76,7 @@ export function Edge() {
         <VideoEmbed id={PROGRAM_VIDEO.id} caption={PROGRAM_VIDEO.caption} />
       </motion.div>
 
-      {/* Body copy — scrolls over the pinned headline (z-10). */}
+      {/* Body copy (z-10; the cursor trail at z-20 passes over it). */}
       <motion.p
         className="relative z-10 mx-auto mt-12 max-w-[640px] text-center text-[20px] text-content-brand tracking-tight-2"
         style={{ lineHeight: 1.4 }}
@@ -92,9 +88,8 @@ export function Edge() {
         {EDGE.body}
       </motion.p>
 
-      {/* Closing portrait — scrolls over the pinned headline (z-10) and
-          parallaxes up faster than scroll. The mobile device-scrub anchors to
-          its bottom-left and travels with it. */}
+      {/* Closing portrait (z-10) — parallaxes up faster than scroll. The mobile
+          device-scrub anchors to its bottom-left and travels with it. */}
       <motion.div
         ref={portraitRef}
         className="relative z-10 mx-auto mt-16 w-full max-w-[472px]"
@@ -118,13 +113,6 @@ export function Edge() {
             bottom-left corner (z-10). */}
         {fine === false && <DeviceScrub sectionRef={sectionRef} />}
       </motion.div>
-
-      {/* Overlap spacer — extends the section so the sticky headline stays
-          pinned at viewport center past the portrait. The next (Details)
-          section is pulled up over this exact span (matching -mt) so it scrolls
-          across the pinned headline instead of the headline unpinning. The
-          spacer and that negative margin cancel, so nothing below shifts. */}
-      <div aria-hidden className="h-[60vh]" />
 
       {/* Desktop: cursor image-trail across the whole section (z-20, behind the
           video, which is z-30). */}
