@@ -49,8 +49,19 @@ export function Edge() {
     >
       <SectionLabel id="program" label="The Program" />
 
-      {/* Headline — the first thing in the section. It scrolls in from below,
-          then scrolls normally with the rest of the section content. */}
+      {/* Featured video — the first thing in the section. Topmost layer (z-30)
+          so the cursor trail passes behind it. */}
+      <motion.div
+        className="relative z-30 mx-auto mt-16 w-full max-w-[720px]"
+        initial={{ opacity: 0, scale: 1.02 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={springSoft}
+      >
+        <VideoEmbed id={PROGRAM_VIDEO.id} caption={PROGRAM_VIDEO.caption} />
+      </motion.div>
+
+      {/* Headline — follows the video, scrolls normally with the section. */}
       <div className="mt-16">
         <motion.h2
           className="mx-auto max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
@@ -64,21 +75,10 @@ export function Edge() {
         </motion.h2>
       </div>
 
-      {/* Featured video — follows the headline. Topmost layer (z-30) so the
-          cursor trail passes behind it. */}
-      <motion.div
-        className="relative z-30 mx-auto mt-16 w-full max-w-[720px]"
-        initial={{ opacity: 0, scale: 1.02 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true, amount: 0.4 }}
-        transition={springSoft}
-      >
-        <VideoEmbed id={PROGRAM_VIDEO.id} caption={PROGRAM_VIDEO.caption} />
-      </motion.div>
-
-      {/* Body copy (z-10; the cursor trail at z-20 passes over it). */}
+      {/* Body copy — 24px below the headline (z-10; the cursor trail at z-20
+          passes over it). */}
       <motion.p
-        className="relative z-10 mx-auto mt-12 max-w-[640px] text-center text-[20px] text-content-brand tracking-tight-2"
+        className="relative z-10 mx-auto mt-6 max-w-[640px] text-center text-[20px] text-content-brand tracking-tight-2"
         style={{ lineHeight: 1.4 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
