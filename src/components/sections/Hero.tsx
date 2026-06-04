@@ -102,7 +102,7 @@ export function Hero() {
           <motion.div
             initial="hidden"
             animate="visible"
-            className="flex max-w-[472px] flex-col gap-6 pb-2 md:col-start-1 md:row-start-2 md:max-w-none md:self-end md:pb-0"
+            className="flex flex-col gap-6 pb-2 md:col-start-1 md:row-start-2 md:self-end md:pb-0"
           >
             {/* Whole paragraph rises as one block from behind a mask. */}
             <div className="overflow-hidden pb-[0.12em] -mb-[0.12em]">
