@@ -34,9 +34,9 @@ export function Apply() {
     >
       <SectionLabel id="apply" label="Apply" />
 
-      {/* Mobile: 800px tall, full-bleed edge-to-edge (cancel the section's px-4).
+      {/* Mobile: 1:1 square, full-bleed edge-to-edge (cancel the section's px-4).
           Desktop: inset within the section, 760px tall. */}
-      <div className="relative -mx-4 mt-6 min-h-[800px] overflow-hidden md:mx-0 md:min-h-[760px]">
+      <div className="relative -mx-4 mt-6 aspect-square overflow-hidden md:mx-0 md:aspect-auto md:min-h-[760px]">
         {/* Full-bleed background photo (static). */}
         <div
           aria-hidden
@@ -44,9 +44,9 @@ export function Apply() {
           style={{ backgroundImage: `url(${asset("/images/apply-bg.webp")})` }}
         />
 
-        {/* Panel: parallaxes up over the photo on mobile; static left column on
-            desktop. Bottom-aligned on mobile, full-height on desktop. */}
-        <div className="relative flex min-h-[800px] items-end p-4 md:min-h-[760px] md:p-6">
+        {/* Panel fills the image box and bottom-aligns its content; it
+            parallaxes up over the photo on mobile, static left column on desktop. */}
+        <div className="absolute inset-0 flex items-end p-4 md:p-6">
           <motion.div
             style={{ y: isMobile ? panelY : undefined }}
             initial={{ opacity: 0 }}
@@ -55,9 +55,9 @@ export function Apply() {
             transition={{ duration: 0.5 }}
             className="flex w-full max-w-[572px] flex-col self-end"
           >
-            {/* Half the background image's height (bg is 800px mobile / 760px
-                desktop), bottom-aligned within the panel. */}
-            <div className="flex h-[400px] flex-col justify-between gap-12 bg-surface-primary p-6 md:h-[380px]">
+            {/* Content-height text card with 24px between heading and body, so
+                more of the background image shows above it. */}
+            <div className="flex flex-col gap-6 bg-surface-primary p-6">
               <h2
                 className="text-content-brand tracking-tight-2 md:text-balance"
                 style={{ fontSize: "clamp(2.25rem, 4.8vw, 3.5rem)", lineHeight: 1.15 }}

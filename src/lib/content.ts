@@ -32,9 +32,9 @@ export const HERO = {
   title: "Listen Future Founder Program",
   pill: "Accepting Applications",
   leadPrimary:
-    "The Future Founder Program is for engineers who want to start a company but haven’t yet.",
+    "The Future Founder Program is for engineers who want to start a company someday.",
   leadSecondary:
-    "You join Listen as an engineer and ship real products, but get far more founder-level learning than a normal eng job: you work closely with customers to see what’s worth building, get workshops on PMF, fundraising, and ideas, and build relationships with the investors behind Listen.",
+    "You join Listen as a full-time engineer, but get far more founder-level learning than a normal engineering role. Own new parts of the product, sell features directly to customers, and learn from our founders and investors about ideation, finding PMF, fundraising, scaling 0 to 1, and more.",
   circle: "This could be you",
   cta: "Apply Now",
 };
@@ -71,7 +71,7 @@ export const DETAILS: Detail[] = [
   },
   {
     n: "02.",
-    title: "Formal Mentorship",
+    title: "Founder Mentorship",
     body: "Mentorship sessions with our founders Alfred and Florian. You’ll get inside visibility on how fundraising, hiring, and product roadmap decisions actually get made at a high-growth company.",
   },
   {
@@ -87,7 +87,7 @@ export const DETAILS: Detail[] = [
   {
     n: "05.",
     title: "Validate ideas using Listen",
-    body: "Take advantage of free Listen credits to run your own customer studies, test ideas, and explore founder-specific workflows.",
+    body: "Listen is an AI research platform that helps companies interview people at scale to understand what they want and why. Take advantage of free Listen credits to run your own customer studies, test ideas, and explore founder-specific workflows.",
   },
   {
     n: "06.",
@@ -97,7 +97,7 @@ export const DETAILS: Detail[] = [
 ];
 
 export const MENTORS_INTRO = {
-  title: "Dedicated workshops led by our founders and investors",
+  title: "Hands-on workshops led by our founders and investors",
   body: "Learn directly from top experts and from your teammates. Over 30% of Listen employees are former founders.",
 };
 
@@ -112,7 +112,7 @@ export const MENTORS: Mentor[] = [
   {
     name: "Alfred Wahlforss",
     role: "CEO & Co-Founder, Listen Labs",
-    bio: "How to make decisions around company vision, hiring, and fundraising. Get a peek behind how one of the fastest moving startups today wins",
+    bio: "How to make decisions around company vision, hiring, and fundraising. Get firsthand exposure to how one of the fastest moving startups today wins",
     image: asset("/images/mentor-alfred.png"),
   },
   {
@@ -157,14 +157,14 @@ export type Testimonial = {
 export const TESTIMONIALS: Testimonial[] = [
   {
     quote:
-      "“Working at Listen has been pretty remarkable. My favorite part is how transparent Alfred and Florian are. I get to see firsthand how decisions around fundraising, hiring, and product roadmap actually get made.”",
+      "“Working at Listen has been pretty remarkable. My favorite part is how I get to see firsthand how decisions around fundraising, hiring, and product roadmap actually get made.”",
     name: "Krish Mehta",
     role: "Founding Engineer, Listen Labs",
     image: asset("/images/testimonial-krish.png"),
   },
   {
     quote:
-      "“Since I talk to so many different customers, I’m constantly seeing new business problems and coming up with new ideas. We’ve gone zero to one, and I’ve learned what it means to not just to build, but how to sell, think about product, and solve deep technical problems.”",
+      "“Since I talk to so many different customers, I’m constantly coming up with new ideas. I’ve learned what it means to not just to build, but how to sell and how to think about product”",
     name: "Ollie Elmgren",
     role: "Engineer, Listen Labs",
     image: asset("/images/testimonial-ollie.png"),
@@ -180,7 +180,7 @@ export const TESTIMONIALS: Testimonial[] = [
 
 export const APPLY = {
   heading: "Apply Now",
-  body: "We encourage applications from ambitious engineers across a wide range of backgrounds and disciplines.",
+  body: "The Future Founder Program is a full-time engineering role at Listen paired with founder-level customer exposure, mentorship, and hands-on building. We encourage applications from ambitious engineers across a wide range of backgrounds and disciplines.",
   cta: "Apply Now",
 };
 
