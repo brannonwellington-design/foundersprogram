@@ -28,6 +28,12 @@ export function Edge() {
     scrollYProgress,
     (v) => (0.5 - v) * (mobileRef.current ? 420 : 140),
   );
+  // Stronger parallax on the central portrait — moves opposite the headline so
+  // the two layers separate more as the section scrolls.
+  const portraitY = useTransform(
+    scrollYProgress,
+    (v) => (v - 0.5) * (mobileRef.current ? 120 : 180),
+  );
 
   // Desktop (fine pointer) gets the cursor trail; touch gets the scroll scrub.
   const [fine, setFine] = useState<boolean | null>(null);
@@ -70,6 +76,7 @@ export function Edge() {
       <div className="relative mx-auto mt-12 w-full max-w-[472px]">
         <motion.div
           className="relative z-0 aspect-[472/560] w-full"
+          style={{ y: portraitY }}
           initial={{ opacity: 0, scale: 1.03 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, amount: 0.4 }}
@@ -85,7 +92,7 @@ export function Edge() {
         {/* Oversized headline, centered over the image, overlapping in front,
             and above the scrolling device layer (z-20). Mobile forces three
             lines: "Listen" / "is your" / "edge". Desktop is one line. */}
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-20 -translate-y-1/2 md:left-1/2 md:right-auto md:w-screen md:-translate-x-1/2">
+        <div className="pointer-events-none absolute inset-x-0 top-[calc(50%+120px)] z-20 -translate-y-1/2 md:left-1/2 md:right-auto md:w-screen md:-translate-x-1/2">
           <motion.h2
             className="text-center text-[clamp(3.25rem,24vw,7rem)] leading-[0.92] text-content-brand tracking-tight-2 md:whitespace-nowrap md:text-[clamp(2.5rem,10.2vw,12rem)] md:leading-none"
             style={{ y: headlineY }}
