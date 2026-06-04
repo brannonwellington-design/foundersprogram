@@ -23,8 +23,12 @@ export function Apply() {
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  // The panel drifts up over the background as the section scrolls through.
-  const panelY = useTransform(scrollYProgress, [0, 1], [110, -110]);
+  // Mobile reveal: the text card starts fully below the (square) image — so the
+  // photo reads unobscured as it scrolls into frame — then rises up into its
+  // resting spot (y: 0) and holds there as the rest of the section scrolls past.
+  // `y` is a percentage of the card's own height, so it clears any size. (clamps
+  // outside the input range, so it stays hidden before and settled after.)
+  const panelY = useTransform(scrollYProgress, [0.2, 0.6], ["110%", "0%"]);
 
   return (
     <section
