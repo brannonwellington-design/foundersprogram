@@ -2,15 +2,16 @@
 
 import { motion } from "motion/react";
 import { HERO } from "@/lib/content";
-import { easeOutExpo, fadeRise, maskRise, springSoft } from "@/lib/motion";
+import { maskRise } from "@/lib/motion";
 import { ApplyButton } from "@/components/ui/ApplyButton";
 import { HeroImage } from "@/components/sections/HeroImage";
 
 /**
  * One shared entrance timeline (seconds). Everything is choreographed off
  * these so the hero loads as a single composed sequence rather than a set of
- * independent fades: the image curtain drops first, the pill and title words
- * cascade up out of it, then the lead and CTA settle in last.
+ * independent fades. Every element — pill, title words, image, lead, CTA —
+ * uses the same wipe-up mask (rising from behind a hard edge), so the whole
+ * landing reveals as one coordinated cascade rather than a mix of effects.
  */
 const T = {
   image: 0.05,
@@ -47,14 +48,17 @@ export function Hero() {
             animate="visible"
             className="flex flex-col items-start gap-4 pt-6 md:col-start-1 md:row-start-1 md:self-start md:pt-8"
           >
-            <motion.span
-              variants={fadeRise}
-              custom={T.pill}
-              className="hidden items-center rounded-[40px] border border-content-brand px-[10px] py-1 text-[14px] text-content-brand tracking-tight-2 md:inline-flex"
-              style={{ lineHeight: "20px" }}
-            >
-              {HERO.pill}
-            </motion.span>
+            {/* Pill rises up from behind a mask, like the title words. */}
+            <span className="hidden overflow-hidden md:inline-block">
+              <motion.span
+                variants={maskRise}
+                custom={T.pill}
+                className="inline-flex items-center rounded-[40px] border border-content-brand px-[10px] py-1 text-[14px] text-content-brand tracking-tight-2"
+                style={{ lineHeight: "20px" }}
+              >
+                {HERO.pill}
+              </motion.span>
+            </span>
 
             <h1
               className="max-w-none text-content-brand tracking-tight-2"
@@ -81,20 +85,19 @@ export function Hero() {
             </h1>
           </motion.div>
 
-          {/* Interactive hero image — drops in behind a top-down clip-path
-              "curtain" while easing out of a slight zoom, so it reveals rather
-              than fades. */}
-          <motion.div
-            initial={{ clipPath: "inset(0 0 100% 0)", scale: 1.08 }}
-            animate={{ clipPath: "inset(0 0 0% 0)", scale: 1 }}
-            transition={{
-              clipPath: { duration: 1.1, ease: easeOutExpo, delay: T.image },
-              scale: { ...springSoft, delay: T.image },
-            }}
-            className="relative h-[52vh] w-full overflow-hidden md:col-start-2 md:row-span-2 md:row-start-1 md:h-auto md:self-stretch"
-          >
-            <HeroImage className="absolute inset-0 h-full w-full" />
-          </motion.div>
+          {/* Interactive hero image — rises up from behind a mask on load,
+              the same wipe-up reveal as the title words. */}
+          <div className="relative h-[52vh] w-full overflow-hidden md:col-start-2 md:row-span-2 md:row-start-1 md:h-auto md:self-stretch">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={maskRise}
+              custom={T.image}
+              className="absolute inset-0"
+            >
+              <HeroImage className="absolute inset-0 h-full w-full" />
+            </motion.div>
+          </div>
 
           {/* Lead + desktop CTA (pinned to the bottom of the left column). */}
           <motion.div
@@ -115,9 +118,11 @@ export function Hero() {
               </motion.p>
             </div>
 
-            <motion.div variants={fadeRise} custom={T.button} className="hidden md:block">
-              <ApplyButton />
-            </motion.div>
+            <div className="hidden overflow-hidden md:block">
+              <motion.div variants={maskRise} custom={T.button} className="inline-block">
+                <ApplyButton />
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { useAnimationFrame, useMotionValue, useVelocity, useScroll } from "motion/react";
+import { motion, useAnimationFrame, useMotionValue, useVelocity, useScroll } from "motion/react";
 import { MARQUEE_ITEMS } from "@/lib/content";
+import { maskRise } from "@/lib/motion";
 
 /**
  * Continuous "ACCEPTING APPLICATIONS · 2026" ticker on the brand-blue bar.
@@ -48,15 +49,19 @@ export function Marquee() {
 
   return (
     <div className="w-full overflow-hidden bg-surface-brand-primary py-1 select-none">
-      <div ref={trackRef} className="flex w-max will-change-transform">
-        <div ref={baseRef} className="flex shrink-0">
-          <MarqueeRow cells={cells} />
+      {/* Banner rises up from behind a mask on load, like the hero title. The
+          inner track keeps its own horizontal scroll transform independently. */}
+      <motion.div initial="hidden" animate="visible" variants={maskRise}>
+        <div ref={trackRef} className="flex w-max will-change-transform">
+          <div ref={baseRef} className="flex shrink-0">
+            <MarqueeRow cells={cells} />
+          </div>
+          {/* Duplicate segment for the seamless wrap. */}
+          <div className="flex shrink-0" aria-hidden>
+            <MarqueeRow cells={cells} />
+          </div>
         </div>
-        {/* Duplicate segment for the seamless wrap. */}
-        <div className="flex shrink-0" aria-hidden>
-          <MarqueeRow cells={cells} />
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
