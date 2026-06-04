@@ -55,8 +55,9 @@ export function Apply() {
             transition={{ duration: 0.5 }}
             className="flex w-full max-w-[572px] flex-col self-end"
           >
-            {/* Content-height on desktop (bottom-aligned), not full image height. */}
-            <div className="flex flex-col justify-between gap-12 bg-surface-primary p-6 md:min-h-[420px]">
+            {/* Half the background image's height (bg is 800px mobile / 760px
+                desktop), bottom-aligned within the panel. */}
+            <div className="flex h-[400px] flex-col justify-between gap-12 bg-surface-primary p-6 md:h-[380px]">
               <h2
                 className="text-content-brand tracking-tight-2 md:text-balance"
                 style={{ fontSize: "clamp(2.25rem, 4.8vw, 3.5rem)", lineHeight: 1.15 }}

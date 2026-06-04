@@ -46,14 +46,16 @@ export function Edge() {
     // it would break the headline's sticky pin.
     <section
       ref={sectionRef}
-      className="relative isolate bg-surface-primary px-4 pb-24 pt-20 md:px-6 md:pt-16"
+      className="relative isolate bg-surface-primary px-4 pt-20 md:px-6 md:pt-16"
     >
       <SectionLabel id="program" label="The Program" />
 
       {/* Headline — the first thing in the section. It scrolls in from below
           normally, then sticks pinned at the vertical center of the viewport
-          (z-0, behind) while the video, body, and portrait scroll up over it. */}
-      <div className="pointer-events-none sticky top-1/2 z-0 mt-36 -translate-y-1/2">
+          (z-0, behind) while the video, body, and portrait scroll up over it.
+          It never unpins: the spacer below keeps it pinned until the next
+          (Details) section, pulled up over it, scrolls across and covers it. */}
+      <div className="pointer-events-none sticky top-1/2 z-0 mt-[168px] -translate-y-1/2">
         <motion.h2
           className="mx-auto max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
           style={{ fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)", lineHeight: 1.05 }}
@@ -116,6 +118,13 @@ export function Edge() {
             bottom-left corner (z-10). */}
         {fine === false && <DeviceScrub sectionRef={sectionRef} />}
       </motion.div>
+
+      {/* Overlap spacer — extends the section so the sticky headline stays
+          pinned at viewport center past the portrait. The next (Details)
+          section is pulled up over this exact span (matching -mt) so it scrolls
+          across the pinned headline instead of the headline unpinning. The
+          spacer and that negative margin cancel, so nothing below shifts. */}
+      <div aria-hidden className="h-[60vh]" />
 
       {/* Desktop: cursor image-trail across the whole section (z-20, behind the
           video, which is z-30). */}
