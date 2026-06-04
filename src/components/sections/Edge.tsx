@@ -18,7 +18,6 @@ import { cn } from "@/lib/cn";
 
 export function Edge() {
   const sectionRef = useRef<HTMLElement>(null);
-  const headlineRef = useRef<HTMLDivElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
 
   // Desktop (fine pointer) gets the cursor trail; touch gets the scroll scrub.
@@ -32,15 +31,6 @@ export function Edge() {
     });
   }, []);
 
-  // Headline parallax: drifts up faster than the page as it enters, reading as
-  // if it slides out from underneath the video player sitting above it.
-  const { scrollYProgress: headlineP } = useScroll({
-    target: headlineRef,
-    offset: ["start end", "center center"],
-  });
-  const headlineY = useTransform(headlineP, [0, 1], [70, -24]);
-  const headlineOpacity = useTransform(headlineP, [0, 0.45], [0, 1]);
-
   // Portrait parallax: travels up noticeably faster than scroll so it rises
   // into view "quicker than average", appearing to emerge from beneath the
   // blue Details section below for added depth.
@@ -51,14 +41,33 @@ export function Edge() {
   const portraitY = useTransform(portraitP, [0, 1], [110, -70]);
 
   return (
+    // `isolate` keeps the section's z-layers self-contained (so the parallax
+    // portrait paints *under* the next section). No `overflow-hidden` here —
+    // it would break the headline's sticky pin.
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-surface-primary px-4 pb-24 pt-20 md:px-6 md:pt-16"
+      className="relative isolate bg-surface-primary px-4 pb-24 pt-20 md:px-6 md:pt-16"
     >
       <SectionLabel id="program" label="The Program" />
 
-      {/* Featured video — topmost layer (z-30) so the cursor trail passes
-          behind it and never obscures the player. */}
+      {/* Headline — the first thing in the section. It scrolls in from below
+          normally, then sticks pinned at the vertical center of the viewport
+          (z-0, behind) while the video, body, and portrait scroll up over it. */}
+      <div className="pointer-events-none sticky top-1/2 z-0 mt-12 -translate-y-1/2">
+        <motion.h2
+          className="mx-auto max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
+          style={{ fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)", lineHeight: 1.05 }}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={springSoft}
+        >
+          {EDGE.title}
+        </motion.h2>
+      </div>
+
+      {/* Featured video — follows the headline, then scrolls up over it.
+          Topmost layer (z-30) so the cursor trail passes behind it. */}
       <motion.div
         className="relative z-30 mx-auto mt-16 w-full max-w-[720px]"
         initial={{ opacity: 0, scale: 1.02 }}
@@ -69,26 +78,9 @@ export function Edge() {
         <VideoEmbed id={PROGRAM_VIDEO.id} caption={PROGRAM_VIDEO.caption} />
       </motion.div>
 
-      {/* Section headline — sits under the video (z-10) and parallaxes into
-          view as the section scrolls, so it reads as rising out from the
-          player above it. */}
-      <div ref={headlineRef} className="relative z-10 mt-10">
-        <motion.h2
-          className="mx-auto max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
-          style={{
-            fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)",
-            lineHeight: 1.05,
-            y: headlineY,
-            opacity: headlineOpacity,
-          }}
-        >
-          {EDGE.title}
-        </motion.h2>
-      </div>
-
-      {/* Body copy, centered below the headline. */}
+      {/* Body copy — scrolls over the pinned headline (z-10). */}
       <motion.p
-        className="mx-auto mt-10 max-w-[640px] text-center text-[20px] text-content-brand tracking-tight-2"
+        className="relative z-10 mx-auto mt-12 max-w-[640px] text-center text-[20px] text-content-brand tracking-tight-2"
         style={{ lineHeight: 1.4 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -98,11 +90,12 @@ export function Edge() {
         {EDGE.body}
       </motion.p>
 
-      {/* Closing portrait — parallaxes up faster than scroll. The mobile
-          device-scrub anchors to its bottom-left and travels with it. */}
+      {/* Closing portrait — scrolls over the pinned headline (z-10) and
+          parallaxes up faster than scroll. The mobile device-scrub anchors to
+          its bottom-left and travels with it. */}
       <motion.div
         ref={portraitRef}
-        className="relative z-0 mx-auto mt-16 w-full max-w-[472px]"
+        className="relative z-10 mx-auto mt-16 w-full max-w-[472px]"
         style={{ y: portraitY }}
       >
         <motion.div
@@ -124,7 +117,7 @@ export function Edge() {
         {fine === false && <DeviceScrub sectionRef={sectionRef} />}
       </motion.div>
 
-      {/* Desktop: cursor image-trail across the whole section (behind the
+      {/* Desktop: cursor image-trail across the whole section (z-20, behind the
           video, which is z-30). */}
       {fine === true && <DeviceTrail sectionRef={sectionRef} />}
     </section>
