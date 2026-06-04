@@ -31,9 +31,10 @@ export const HERO_IMAGE_FALLBACK = asset("/images/hero-portrait.webp");
 export const HERO = {
   title: "Listen Future Founder Program",
   pill: "Accepting Applications",
-  leadPrimary: "When anyone can build, knowing what to build is everything.",
+  leadPrimary:
+    "The Future Founders Program is for engineers who want to start a company but haven’t yet.",
   leadSecondary:
-    "A cohort program for exceptional talent at the beginning of their founding journey.",
+    "You join Listen as an engineer and ship real products, but get far more founder-level learning than a normal eng job: you work closely with customers to see what’s worth building, get workshops on PMF, fundraising, and ideas, and build relationships with the investors behind Listen.",
   circle: "This could be you",
   cta: "Apply Now",
 };
