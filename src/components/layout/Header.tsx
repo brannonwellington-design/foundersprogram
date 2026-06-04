@@ -156,27 +156,33 @@ function Bar({
 
       {/* Desktop nav */}
       <nav className="hidden items-center gap-8 md:flex">
-        {NAV_LINKS.map((link, i) => (
-          <a
-            key={link.href}
-            href={link.href}
-            tabIndex={decorative ? -1 : undefined}
-            className="group relative text-[14px] text-current tracking-tight-2"
-            style={{ lineHeight: "20px" }}
-          >
-            {/* Padding/negative-margin keeps descenders clear of the mask edge. */}
-            <span className="inline-block overflow-hidden pb-[0.15em] -mb-[0.15em] align-bottom">
-              <motion.span
-                className="inline-block"
-                variants={animate ? maskRise : undefined}
-                custom={NAV_T.nav + i * NAV_T.navStep}
-              >
-                {link.label}
-              </motion.span>
-            </span>
-            <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100" />
-          </a>
-        ))}
+        {NAV_LINKS.map((link, i) => {
+          // External (job posting) links open in a new tab; in-page anchors don't.
+          const external = link.href.startsWith("http");
+          return (
+            <a
+              key={link.href}
+              href={link.href}
+              target={external ? "_blank" : undefined}
+              rel={external ? "noopener noreferrer" : undefined}
+              tabIndex={decorative ? -1 : undefined}
+              className="group relative text-[14px] text-current tracking-tight-2"
+              style={{ lineHeight: "20px" }}
+            >
+              {/* Padding/negative-margin keeps descenders clear of the mask edge. */}
+              <span className="inline-block overflow-hidden pb-[0.15em] -mb-[0.15em] align-bottom">
+                <motion.span
+                  className="inline-block"
+                  variants={animate ? maskRise : undefined}
+                  custom={NAV_T.nav + i * NAV_T.navStep}
+                >
+                  {link.label}
+                </motion.span>
+              </span>
+              <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100" />
+            </a>
+          );
+        })}
       </nav>
 
       {/* Mobile control */}
@@ -223,22 +229,28 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
         initial="hidden"
         animate="visible"
       >
-        {NAV_LINKS.map((link) => (
-          <motion.a
-            key={link.href}
-            href={link.href}
-            onClick={onClose}
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            transition={springSnappy}
-            className="text-content-brand tracking-tight-2"
-            style={{ fontSize: "clamp(40px, 12vw, 56px)", lineHeight: 1.1 }}
-          >
-            {link.label}
-          </motion.a>
-        ))}
+        {NAV_LINKS.map((link) => {
+          // External (job posting) links open in a new tab; in-page anchors don't.
+          const external = link.href.startsWith("http");
+          return (
+            <motion.a
+              key={link.href}
+              href={link.href}
+              target={external ? "_blank" : undefined}
+              rel={external ? "noopener noreferrer" : undefined}
+              onClick={onClose}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={springSnappy}
+              className="text-content-brand tracking-tight-2"
+              style={{ fontSize: "clamp(40px, 12vw, 56px)", lineHeight: 1.1 }}
+            >
+              {link.label}
+            </motion.a>
+          );
+        })}
       </motion.nav>
 
       <div className="px-4 pb-8">
