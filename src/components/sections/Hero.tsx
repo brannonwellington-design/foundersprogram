@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { HERO } from "@/lib/content";
-import { maskRise } from "@/lib/motion";
+import { easeOutExpo, maskRise } from "@/lib/motion";
 import { ApplyButton } from "@/components/ui/ApplyButton";
 import { HeroImage } from "@/components/sections/HeroImage";
 
@@ -85,14 +85,13 @@ export function Hero() {
             </h1>
           </motion.div>
 
-          {/* Interactive hero image — rises up from behind a mask on load,
-              the same wipe-up reveal as the title words. */}
+          {/* Interactive hero image — stays in place while a bottom-up mask
+              reveals it on load, rather than the whole frame sliding in. */}
           <div className="relative h-[52vh] w-full overflow-hidden md:col-start-2 md:row-span-2 md:row-start-1 md:h-auto md:self-stretch">
             <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={maskRise}
-              custom={T.image}
+              initial={{ clipPath: "inset(100% 0 0 0)" }}
+              animate={{ clipPath: "inset(0 0 0 0)" }}
+              transition={{ duration: 1.0, ease: easeOutExpo, delay: T.image }}
               className="absolute inset-0"
             >
               <HeroImage className="absolute inset-0 h-full w-full" />

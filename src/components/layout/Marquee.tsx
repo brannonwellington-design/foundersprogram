@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { motion, useAnimationFrame, useMotionValue, useVelocity, useScroll } from "motion/react";
 import { MARQUEE_ITEMS } from "@/lib/content";
-import { maskRise } from "@/lib/motion";
+import { easeOutExpo } from "@/lib/motion";
 
 /**
  * Continuous "ACCEPTING APPLICATIONS · 2026" ticker on the brand-blue bar.
@@ -48,21 +48,24 @@ export function Marquee() {
   const cells = Array.from({ length: 14 }, (_, i) => MARQUEE_ITEMS[i % MARQUEE_ITEMS.length]);
 
   return (
-    <div className="w-full overflow-hidden bg-surface-brand-primary py-1 select-none">
-      {/* Banner rises up from behind a mask on load, like the hero title. The
-          inner track keeps its own horizontal scroll transform independently. */}
-      <motion.div initial="hidden" animate="visible" variants={maskRise}>
-        <div ref={trackRef} className="flex w-max will-change-transform">
-          <div ref={baseRef} className="flex shrink-0">
-            <MarqueeRow cells={cells} />
-          </div>
-          {/* Duplicate segment for the seamless wrap. */}
-          <div className="flex shrink-0" aria-hidden>
-            <MarqueeRow cells={cells} />
-          </div>
+    // The whole bar — blue background and all — wipes in from the bottom up on
+    // load via a clip-path reveal, matching the hero's bottom-up image wipe.
+    <motion.div
+      initial={{ clipPath: "inset(100% 0 0 0)" }}
+      animate={{ clipPath: "inset(0 0 0 0)" }}
+      transition={{ duration: 0.8, ease: easeOutExpo }}
+      className="w-full overflow-hidden bg-surface-brand-primary py-1 select-none"
+    >
+      <div ref={trackRef} className="flex w-max will-change-transform">
+        <div ref={baseRef} className="flex shrink-0">
+          <MarqueeRow cells={cells} />
         </div>
-      </motion.div>
-    </div>
+        {/* Duplicate segment for the seamless wrap. */}
+        <div className="flex shrink-0" aria-hidden>
+          <MarqueeRow cells={cells} />
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
