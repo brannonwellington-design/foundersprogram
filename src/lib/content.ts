@@ -44,6 +44,16 @@ export const EDGE = {
   body: "Many of the best founders started exactly this way: joining a company with strong PMF and learning how it gets built up close. We designed the program we wish we’d had, solving hard technical problems while staying close to customers, with far more ownership than normal engineering. That’s what you do here, before you go start your own.",
 };
 
+/**
+ * Program-section YouTube embed. Drop the video ID in (the part after
+ * `watch?v=` / `youtu.be/`) to go live; the poster comes from YouTube.
+ * While `id` is empty the section shows a branded placeholder with the caption.
+ */
+export const PROGRAM_VIDEO = {
+  id: "",
+  caption: "The most important AI companies haven’t been founded yet.",
+};
+
 /** Listening-device photos for the Program section (cursor trail / scroll scrub). */
 export const LISTENING_DEVICES = Array.from({ length: 13 }, (_, i) =>
   asset(`/images/listening_device_${String(i + 1).padStart(2, "0")}.webp`),
