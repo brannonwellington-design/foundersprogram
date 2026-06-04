@@ -40,8 +40,8 @@ export const HERO = {
 };
 
 export const EDGE = {
-  title: "Listen is your edge",
-  body: "You already know how to code. The hard part is knowing what to build. Listen’s Founder Program gives you that: daily, firsthand exposure to the problems customers are desperate to solve, across every industry.",
+  title: "You’re an engineer with the dream of becoming a founder",
+  body: "Many of the best founders started exactly this way: joining a company with strong PMF and learning how it gets built up close. We designed the program we wish we’d had, solving hard technical problems while staying close to customers, with far more ownership than normal engineering. That’s what you do here, before you go start your own.",
 };
 
 /** Listening-device photos for the Program section (cursor trail / scroll scrub). */
@@ -49,44 +49,46 @@ export const LISTENING_DEVICES = Array.from({ length: 13 }, (_, i) =>
   asset(`/images/listening_device_${String(i + 1).padStart(2, "0")}.webp`),
 );
 
+export const DETAILS_HEADLINE = "From Engineer to Founder";
+
 export type Detail = { n: string; title: string; body: string };
 
 export const DETAILS: Detail[] = [
   {
     n: "01.",
-    title: "Hands-On Workshops",
-    body: "Four immersive workshops per year led by investors and operators covering financing, product-market fit, scaling, and how to find the best startup ideas.",
+    title: "Learn from experts and build relationships with investors",
+    body: "Immersive workshops led by investors and operators covering how to find the best startup ideas, product market fit, financing, and scaling.",
   },
   {
     n: "02.",
-    title: "Formal Mentorship with Our Founders",
-    body: "Structured mentorship sessions with Alfred and Florian. You’ll get inside visibility on how fundraising, hiring, and product roadmap decisions actually get made at a high-growth company.",
+    title: "Formal Mentorship",
+    body: "Mentorship sessions with our founders Alfred and Florian. You’ll get inside visibility on how fundraising, hiring, and product roadmap decisions actually get made at a high-growth company.",
   },
   {
     n: "03.",
-    title: "Deep Customer Immersion",
-    body: "Talk directly with real customers. You’ll see exactly where they struggle, what they love, and what they’d pay anything to fix.",
+    title: "Customer Immersion",
+    body: "This role goes beyond just building. Talk directly with real customers as you create products and features. You’ll see exactly where they struggle, what they love, and develop a strong sense for problems they would pay anything to fix.",
   },
   {
     n: "04.",
-    title: "Exceptional Network",
-    body: "A tight-knit group of builders per cohort, where you’ll meet your future co-founders, advisors, and lifelong collaborators.",
+    title: "Exceptional Cohort",
+    body: "This is a highly selective program designed for top talent. Join a small tight-knit group of standout engineers where you’ll meet your future co-founders, advisors, and lifelong collaborators.",
   },
   {
     n: "05.",
-    title: "Listen Credits",
-    body: "Free Listen credits to run your own customer studies, test ideas, and explore founder-specific workflows, using the product to find your own product-market fit.",
+    title: "Validate ideas using Listen",
+    body: "Take advantage of free Listen credits to run your own customer studies, test ideas, and explore founder-specific workflows.",
   },
   {
     n: "06.",
-    title: "End-to-End Ownership",
-    body: "Cohort members own real products and launches, not just tasks. You’ll make meaningful decisions about product direction, customer strategy, and go-to-market.",
+    title: "Outsized Influence",
+    body: "Own real products customers rely on, not just tasks. You’ll have meaningful ownership of product direction, customer strategy, and go-to-market.",
   },
 ];
 
 export const MENTORS_INTRO = {
   title: "Dedicated workshops led by our founders and investors",
-  body: "You’ll learn from the team at Listen. Over 30% of us are former founders.",
+  body: "Learn directly from top experts and from your teammates. Over 30% of Listen employees are former founders.",
 };
 
 export type Mentor = {
@@ -100,37 +102,37 @@ export const MENTORS: Mentor[] = [
   {
     name: "Alfred Wahlforss",
     role: "CEO & Co-Founder, Listen Labs",
-    bio: "Runs immersive sessions on how decisions around fundraising, hiring, and product roadmap actually get made inside one of the fastest moving startups",
+    bio: "How to make decisions around company vision, hiring, and fundraising. Get a peek behind how one of the fastest moving startups today wins",
     image: asset("/images/mentor-alfred.png"),
   },
   {
     name: "Florian Juengermann",
     role: "CTO & Co-Founder, Listen Labs",
-    bio: "Brings deep perspective as a technical founder on building a product that customers love and how to develop the instincts to get you there faster",
+    bio: "How to build a product that customers love. Perspective as a technical founder leading well beyond engineering",
     image: asset("/images/mentor-florian.png"),
   },
   {
     name: "Mar Hershenson",
-    role: "Partner, Pear VC, Professor at Stanford Business School",
-    bio: "One of the sharpest minds on idea generation and early-stage company building",
+    role: "Partner, Pear VC, Lecturer at Science and Engineering at Stanford",
+    bio: "How to find the best ideas. One of the sharpest minds on idea generation and early-stage company building",
     image: asset("/images/mentor-mar.png"),
   },
   {
     name: "Mike Vernal",
     role: "Partner, Conviction",
-    bio: "Previously reported directly to Mark Zuckerberg at Facebook, where he ran core product",
+    bio: "How to find product market fit. Previously reported directly to Mark Zuckerberg at Facebook, where he ran core product",
     image: asset("/images/mentor-mike.png"),
   },
   {
     name: "Konstantine Buhler",
     role: "Partner, Sequoia",
-    bio: "Deep experience in early-stage company building, fundraising strategy, and what separates fundable from fundable-and-great",
+    bio: "How to finance a company. Deep experience in early-stage company building, fundraising strategy, and what separates fundable from fundable-and-great",
     image: asset("/images/mentor-konstantine.png"),
   },
   {
     name: "Nick Shalek",
     role: "Partner, Ribbit Capital",
-    bio: "Has seen firsthand what it takes to move from initial traction to a machine that scales and what kills companies in between",
+    bio: "Scaling from 1 to 100. Has seen firsthand what it takes to move from initial traction to a machine that scales and what kills companies in between",
     image: asset("/images/mentor-nick.png"),
   },
 ];
@@ -167,8 +169,8 @@ export const TESTIMONIALS: Testimonial[] = [
 ];
 
 export const APPLY = {
-  heading: "Apply now to the founding cohort.",
-  body: "We encourage applications from technical builders across a wide range of backgrounds, disciplines, and experience levels. Strong candidates have experience building software systems and are excited to speak with customers.",
+  heading: "Apply Now",
+  body: "We encourage applications from ambitious engineers across a wide range of backgrounds and disciplines.",
   cta: "Apply Now",
 };
 

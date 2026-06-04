@@ -2,7 +2,7 @@
 
 import { Fragment } from "react";
 import { motion } from "motion/react";
-import { DETAILS, type Detail } from "@/lib/content";
+import { DETAILS, DETAILS_HEADLINE, type Detail } from "@/lib/content";
 import { springSoft } from "@/lib/motion";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 
@@ -28,11 +28,24 @@ export function Details() {
     >
       <SectionLabel label="Details" tone="contrast" />
 
+      {/* Centered section headline, introduced above the numbered rows. */}
+      <motion.h2
+        className="mx-auto mt-20 max-w-[820px] text-center tracking-tight-2"
+        style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", lineHeight: 1.05 }}
+        variants={rise}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.6 }}
+        transition={springSoft}
+      >
+        {DETAILS_HEADLINE}
+      </motion.h2>
+
       {/*
         Rows and hairlines are equal siblings in one column with a single gap,
         so every hairline sits exactly halfway between two text blocks.
       */}
-      <div className="mt-24 flex flex-col gap-18">
+      <div className="mt-20 flex flex-col gap-18">
         {DETAILS.map((d, i) => (
           <Fragment key={d.n}>
             {i > 0 && <DrawingHairline />}
