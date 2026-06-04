@@ -4,9 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/content";
-import { spring, springSnappy, staggerContainer } from "@/lib/motion";
+import { maskRise, spring, springSnappy, staggerContainer } from "@/lib/motion";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { ApplyButton } from "@/components/ui/ApplyButton";
+
+/**
+ * Entrance timeline (seconds) for the nav, sharing the hero's wipe-up mask:
+ * the logo rises first, then the links cascade up after it.
+ */
+const NAV_T = { logo: 0.08, nav: 0.14, navStep: 0.05 };
 
 /**
  * Sticky top navigation (68px on desktop).
@@ -121,20 +127,36 @@ function Bar({
   open?: boolean;
   decorative?: boolean;
 }) {
+  // Only the real bar plays the load animation; the decorative blue copy stays
+  // at rest (it's revealed later by the scroll-driven color wipe).
+  const animate = !decorative;
   return (
-    <div className="flex h-14 items-center justify-between px-4 md:h-[68px] md:px-6">
+    <motion.div
+      className="flex h-14 items-center justify-between px-4 md:h-[68px] md:px-6"
+      initial={animate ? "hidden" : false}
+      animate={animate ? "visible" : false}
+    >
       <a
         href={decorative ? undefined : "#top"}
         aria-label={decorative ? undefined : "Listen — home"}
         className="text-current"
         tabIndex={decorative ? -1 : undefined}
       >
-        <Wordmark ariaLabel={decorative ? undefined : "Listen"} className="h-5 w-auto" />
+        {/* Logo rises up from behind a mask, like the hero title. */}
+        <span className="block overflow-hidden">
+          <motion.span
+            className="block"
+            variants={animate ? maskRise : undefined}
+            custom={NAV_T.logo}
+          >
+            <Wordmark ariaLabel={decorative ? undefined : "Listen"} className="h-5 w-auto" />
+          </motion.span>
+        </span>
       </a>
 
       {/* Desktop nav */}
       <nav className="hidden items-center gap-8 md:flex">
-        {NAV_LINKS.map((link) => (
+        {NAV_LINKS.map((link, i) => (
           <a
             key={link.href}
             href={link.href}
@@ -142,7 +164,16 @@ function Bar({
             className="group relative text-[14px] text-current tracking-tight-2"
             style={{ lineHeight: "20px" }}
           >
-            {link.label}
+            {/* Padding/negative-margin keeps descenders clear of the mask edge. */}
+            <span className="inline-block overflow-hidden pb-[0.15em] -mb-[0.15em] align-bottom">
+              <motion.span
+                className="inline-block"
+                variants={animate ? maskRise : undefined}
+                custom={NAV_T.nav + i * NAV_T.navStep}
+              >
+                {link.label}
+              </motion.span>
+            </span>
             <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100" />
           </a>
         ))}
@@ -159,7 +190,7 @@ function Bar({
       >
         <Menu size={24} strokeWidth={2} />
       </button>
-    </div>
+    </motion.div>
   );
 }
 

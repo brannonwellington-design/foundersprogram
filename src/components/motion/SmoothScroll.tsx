@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { MotionConfig } from "motion/react";
 import Lenis from "lenis";
 
 /**
@@ -47,5 +48,8 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  return <>{children}</>;
+  // `reducedMotion="user"` makes every motion component honor the OS setting,
+  // stripping transform/clip entrances (and keeping content visible) for users
+  // who prefer reduced motion — matching the CSS guard in globals.css.
+  return <MotionConfig reducedMotion="user">{children}</MotionConfig>;
 }
