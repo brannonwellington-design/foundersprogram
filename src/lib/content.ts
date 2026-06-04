@@ -32,7 +32,7 @@ export const HERO = {
   title: "Listen Future Founder Program",
   pill: "Accepting Applications",
   leadPrimary:
-    "The Future Founders Program is for engineers who want to start a company but haven’t yet.",
+    "The Future Founder Program is for engineers who want to start a company but haven’t yet.",
   leadSecondary:
     "You join Listen as an engineer and ship real products, but get far more founder-level learning than a normal eng job: you work closely with customers to see what’s worth building, get workshops on PMF, fundraising, and ideas, and build relationships with the investors behind Listen.",
   circle: "This could be you",
