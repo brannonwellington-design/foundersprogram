@@ -26,9 +26,11 @@ export function Apply() {
   // Mobile reveal: the text card starts fully below the (square) image — so the
   // photo reads unobscured as it scrolls into frame — then rises up into its
   // resting spot (y: 0) and holds there as the rest of the section scrolls past.
+  // It finishes rising before the section reaches center (~0.52), so the CTA has
+  // fully cleared the image's bottom edge by the time the panel is read.
   // `y` is a percentage of the card's own height, so it clears any size. (clamps
   // outside the input range, so it stays hidden before and settled after.)
-  const panelY = useTransform(scrollYProgress, [0.2, 0.6], ["110%", "0%"]);
+  const panelY = useTransform(scrollYProgress, [0.15, 0.4], ["110%", "0%"]);
 
   return (
     <section

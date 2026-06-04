@@ -6,7 +6,6 @@ import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/content";
 import { maskRise, spring, springSnappy, staggerContainer } from "@/lib/motion";
 import { Wordmark } from "@/components/ui/Wordmark";
-import { ApplyButton } from "@/components/ui/ApplyButton";
 
 /**
  * Entrance timeline (seconds) for the nav, sharing the hero's wipe-up mask:
@@ -252,10 +251,6 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
           );
         })}
       </motion.nav>
-
-      <div className="px-4 pb-8">
-        <ApplyButton fill onClick={onClose} />
-      </div>
     </motion.div>
   );
 }
