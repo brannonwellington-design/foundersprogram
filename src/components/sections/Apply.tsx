@@ -48,9 +48,10 @@ export function Apply() {
           style={{ backgroundImage: `url(${asset("/images/apply-bg.webp")})` }}
         />
 
-        {/* Panel fills the image box and bottom-aligns its content; it
-            parallaxes up over the photo on mobile, static left column on desktop. */}
-        <div className="absolute inset-0 flex items-end p-4 md:p-6">
+        {/* Panel fills the image box and bottom-aligns its content (24px from
+            the bottom edge); it parallaxes up over the photo on mobile, static
+            left column on desktop. */}
+        <div className="absolute inset-0 flex items-end p-4 pb-6 md:p-6">
           <motion.div
             style={{ y: isMobile ? panelY : undefined }}
             initial={{ opacity: 0 }}
