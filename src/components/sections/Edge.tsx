@@ -5,6 +5,7 @@ import {
   AnimatePresence,
   motion,
   useScroll,
+  useTransform,
   type MotionValue,
 } from "motion/react";
 import { Play } from "lucide-react";
@@ -17,6 +18,8 @@ import { cn } from "@/lib/cn";
 
 export function Edge() {
   const sectionRef = useRef<HTMLElement>(null);
+  const headlineRef = useRef<HTMLDivElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
 
   // Desktop (fine pointer) gets the cursor trail; touch gets the scroll scrub.
   const [fine, setFine] = useState<boolean | null>(null);
@@ -29,6 +32,24 @@ export function Edge() {
     });
   }, []);
 
+  // Headline parallax: drifts up faster than the page as it enters, reading as
+  // if it slides out from underneath the video player sitting above it.
+  const { scrollYProgress: headlineP } = useScroll({
+    target: headlineRef,
+    offset: ["start end", "center center"],
+  });
+  const headlineY = useTransform(headlineP, [0, 1], [70, -24]);
+  const headlineOpacity = useTransform(headlineP, [0, 0.45], [0, 1]);
+
+  // Portrait parallax: travels up noticeably faster than scroll so it rises
+  // into view "quicker than average", appearing to emerge from beneath the
+  // blue Details section below for added depth.
+  const { scrollYProgress: portraitP } = useScroll({
+    target: portraitRef,
+    offset: ["start end", "end start"],
+  });
+  const portraitY = useTransform(portraitP, [0, 1], [110, -70]);
+
   return (
     <section
       ref={sectionRef}
@@ -36,21 +57,10 @@ export function Edge() {
     >
       <SectionLabel id="program" label="The Program" />
 
-      {/* Section headline, centered above the video. */}
-      <motion.h2
-        className="mx-auto mt-16 max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
-        style={{ fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)", lineHeight: 1.05 }}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.6 }}
-        transition={springSoft}
-      >
-        {EDGE.title}
-      </motion.h2>
-
-      {/* Featured video — relative z-10 so it sits above the cursor trail. */}
+      {/* Featured video — topmost layer (z-30) so the cursor trail passes
+          behind it and never obscures the player. */}
       <motion.div
-        className="relative z-10 mx-auto mt-12 w-full max-w-[720px]"
+        className="relative z-30 mx-auto mt-16 w-full max-w-[720px]"
         initial={{ opacity: 0, scale: 1.02 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true, amount: 0.4 }}
@@ -59,9 +69,26 @@ export function Edge() {
         <VideoEmbed id={PROGRAM_VIDEO.id} caption={PROGRAM_VIDEO.caption} />
       </motion.div>
 
-      {/* Body copy, centered below the video. */}
+      {/* Section headline — sits under the video (z-10) and parallaxes into
+          view as the section scrolls, so it reads as rising out from the
+          player above it. */}
+      <div ref={headlineRef} className="relative z-10 mt-10">
+        <motion.h2
+          className="mx-auto max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
+          style={{
+            fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)",
+            lineHeight: 1.05,
+            y: headlineY,
+            opacity: headlineOpacity,
+          }}
+        >
+          {EDGE.title}
+        </motion.h2>
+      </div>
+
+      {/* Body copy, centered below the headline. */}
       <motion.p
-        className="mx-auto mt-12 max-w-[640px] text-center text-[20px] text-content-brand tracking-tight-2"
+        className="mx-auto mt-10 max-w-[640px] text-center text-[20px] text-content-brand tracking-tight-2"
         style={{ lineHeight: 1.4 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -71,8 +98,13 @@ export function Edge() {
         {EDGE.body}
       </motion.p>
 
-      {/* Closing portrait. The mobile device-scrub anchors to its bottom-left. */}
-      <div className="relative mx-auto mt-16 w-full max-w-[472px]">
+      {/* Closing portrait — parallaxes up faster than scroll. The mobile
+          device-scrub anchors to its bottom-left and travels with it. */}
+      <motion.div
+        ref={portraitRef}
+        className="relative z-0 mx-auto mt-16 w-full max-w-[472px]"
+        style={{ y: portraitY }}
+      >
         <motion.div
           className="relative z-0 aspect-[472/560] w-full"
           initial={{ opacity: 0, scale: 1.03 }}
@@ -90,9 +122,10 @@ export function Edge() {
         {/* Mobile: the rotating device frame, 16px from the image's
             bottom-left corner (z-10). */}
         {fine === false && <DeviceScrub sectionRef={sectionRef} />}
-      </div>
+      </motion.div>
 
-      {/* Desktop: cursor image-trail across the whole section. */}
+      {/* Desktop: cursor image-trail across the whole section (behind the
+          video, which is z-30). */}
       {fine === true && <DeviceTrail sectionRef={sectionRef} />}
     </section>
   );

@@ -50,7 +50,7 @@ export const EDGE = {
  * While `id` is empty the section shows a branded placeholder with the caption.
  */
 export const PROGRAM_VIDEO = {
-  id: "",
+  id: "A3j9jXznhrU",
   caption: "The most important AI companies haven’t been founded yet.",
 };
 

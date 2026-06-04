@@ -46,16 +46,17 @@ export function Apply() {
 
         {/* Panel: parallaxes up over the photo on mobile; static left column on
             desktop. Bottom-aligned on mobile, full-height on desktop. */}
-        <div className="relative flex min-h-[800px] items-end p-4 md:min-h-[760px] md:items-stretch md:p-6">
+        <div className="relative flex min-h-[800px] items-end p-4 md:min-h-[760px] md:p-6">
           <motion.div
             style={{ y: isMobile ? panelY : undefined }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5 }}
-            className="flex w-full max-w-[572px] flex-col self-end md:self-stretch"
+            className="flex w-full max-w-[572px] flex-col self-end"
           >
-            <div className="flex flex-1 flex-col justify-between gap-12 bg-surface-primary p-6">
+            {/* Content-height on desktop (bottom-aligned), not full image height. */}
+            <div className="flex flex-col justify-between gap-12 bg-surface-primary p-6 md:min-h-[420px]">
               <h2
                 className="text-content-brand tracking-tight-2 md:text-balance"
                 style={{ fontSize: "clamp(2.25rem, 4.8vw, 3.5rem)", lineHeight: 1.15 }}
