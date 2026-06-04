@@ -64,8 +64,8 @@ export function Edge() {
       {/* Headline — follows the video, scrolls normally with the section. */}
       <div className="mt-16">
         <motion.h2
-          className="mx-auto max-w-[820px] text-balance text-center text-content-brand tracking-tight-2"
-          style={{ fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)", lineHeight: 1.05 }}
+          className="mx-auto max-w-[820px] text-balance text-left text-[32px] text-content-brand tracking-tight-2 md:text-center md:text-[clamp(2.25rem,4.6vw,3.75rem)]"
+          style={{ lineHeight: 1.05 }}
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
@@ -75,10 +75,10 @@ export function Edge() {
         </motion.h2>
       </div>
 
-      {/* Body copy — 24px below the headline (z-10; the cursor trail at z-20
-          passes over it). */}
+      {/* Body copy — 16px below the headline on mobile, 24px on desktop (z-10;
+          the cursor trail at z-20 passes over it). */}
       <motion.p
-        className="relative z-10 mx-auto mt-6 max-w-[640px] text-center text-[20px] text-content-brand tracking-tight-2"
+        className="relative z-10 mx-auto mt-4 max-w-[640px] text-left text-[16px] text-content-brand tracking-tight-2 md:mt-6 md:text-center md:text-[20px]"
         style={{ lineHeight: 1.4 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
