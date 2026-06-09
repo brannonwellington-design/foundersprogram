@@ -56,7 +56,7 @@ export function Mentors() {
 
 function MentorCard({ mentor }: { mentor: Mentor }) {
   return (
-    <li className="col-span-8 min-w-0 odd:col-start-1 even:col-start-5 md:col-span-1 md:col-start-auto">
+    <li className="min-w-0 max-md:col-span-8 max-md:odd:col-start-1 max-md:even:col-start-5">
       <MaskGroup className="group flex flex-col gap-4">
         <MaskMedia>
           <Figure
