@@ -4,6 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { HERO_IMAGES, HERO_IMAGE_FALLBACK } from "@/lib/content";
 import { cn } from "@/lib/cn";
 
+type DeviceOrientationCtor = typeof DeviceOrientationEvent & {
+  requestPermission?: () => Promise<"granted" | "denied">;
+};
+
+function deviceOrientationCtor(): DeviceOrientationCtor | undefined {
+  if (typeof DeviceOrientationEvent === "undefined") return undefined;
+  return DeviceOrientationEvent as DeviceOrientationCtor;
+}
+
 /**
  * Interactive hero image. Desktop: cursor X across the page selects the frame.
  * Mobile: tilt left↔right via gyro (HTTPS + permission on iOS), or drag across
@@ -50,7 +59,7 @@ export function HeroImage({ className }: { className?: string }) {
   useEffect(() => {
     if (window.matchMedia("(pointer: fine)").matches) return;
     if (!window.isSecureContext) return;
-    if (typeof DeviceOrientationEvent?.requestPermission !== "function") return;
+    if (typeof deviceOrientationCtor()?.requestPermission !== "function") return;
     setShowGyroHint(true);
   }, []);
 
@@ -115,14 +124,15 @@ export function HeroImage({ className }: { className?: string }) {
 
     const start = () => window.addEventListener("deviceorientation", onOrient);
 
-    if (typeof DeviceOrientationEvent === "undefined") return;
+    const DOEvent = deviceOrientationCtor();
+    if (!DOEvent) return;
 
     if (!window.isSecureContext) {
       // iOS blocks gyro over http://192.168.x.x — touch drag is the fallback.
       return;
     }
 
-    if (typeof DeviceOrientationEvent.requestPermission !== "function") {
+    if (typeof DOEvent.requestPermission !== "function") {
       start();
       return () => window.removeEventListener("deviceorientation", onOrient);
     }
@@ -132,7 +142,7 @@ export function HeroImage({ className }: { className?: string }) {
       if (gyroPermissionPending.current || gyroActive.current) return;
       gyroPermissionPending.current = true;
 
-      DeviceOrientationEvent.requestPermission()
+      DOEvent.requestPermission!()
         .then((res) => {
           gyroPermissionPending.current = false;
           if (res === "granted") {
