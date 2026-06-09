@@ -13,11 +13,13 @@ export function HeroImage({ className }: { className?: string }) {
   const count = HERO_IMAGES.length;
   const rootRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(Math.floor(count / 2));
+  const [showGyroHint, setShowGyroHint] = useState(false);
   const frame = useRef(0);
   const pending = useRef<number | null>(null);
   const ready = useRef(false);
   const decoded = useRef(0);
   const gyroActive = useRef(false);
+  const gyroPermissionPending = useRef(false);
 
   const scheduleIndex = useCallback(
     (idx: number) => {
@@ -43,6 +45,13 @@ export function HeroImage({ className }: { className?: string }) {
       ready.current = true;
     }, 900);
     return () => window.clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (window.matchMedia("(pointer: fine)").matches) return;
+    if (!window.isSecureContext) return;
+    if (typeof DeviceOrientationEvent?.requestPermission !== "function") return;
+    setShowGyroHint(true);
   }, []);
 
   // Desktop: cursor X across the page selects the frame.
@@ -90,56 +99,59 @@ export function HeroImage({ className }: { className?: string }) {
   useEffect(() => {
     if (window.matchMedia("(pointer: fine)").matches) return;
 
+    const el = rootRef.current;
+    if (!el) return;
+
     const TILT = 35;
     const onOrient = (e: DeviceOrientationEvent) => {
       if (!ready.current) return;
       const gamma = e.gamma;
       if (gamma == null) return;
       gyroActive.current = true;
+      setShowGyroHint(false);
       const clamped = Math.max(-TILT, Math.min(TILT, gamma));
       scheduleIndex(Math.round(((clamped + TILT) / (TILT * 2)) * (count - 1)));
     };
 
     const start = () => window.addEventListener("deviceorientation", onOrient);
 
-    type DOE = typeof DeviceOrientationEvent & {
-      requestPermission?: () => Promise<"granted" | "denied">;
-    };
-    const DOEvent =
-      typeof DeviceOrientationEvent !== "undefined"
-        ? (DeviceOrientationEvent as DOE)
-        : undefined;
-    if (!DOEvent) return;
+    if (typeof DeviceOrientationEvent === "undefined") return;
 
     if (!window.isSecureContext) {
       // iOS blocks gyro over http://192.168.x.x — touch drag is the fallback.
       return;
     }
 
-    if (typeof DOEvent.requestPermission !== "function") {
+    if (typeof DeviceOrientationEvent.requestPermission !== "function") {
       start();
       return () => window.removeEventListener("deviceorientation", onOrient);
     }
 
-    const el = rootRef.current;
-    let requested = false;
-    const request = () => {
-      if (requested) return;
-      requested = true;
-      DOEvent.requestPermission?.()
+    // iOS requires a direct tap on the hero — not a page scroll touchend.
+    const requestGyro = () => {
+      if (gyroPermissionPending.current || gyroActive.current) return;
+      gyroPermissionPending.current = true;
+
+      DeviceOrientationEvent.requestPermission()
         .then((res) => {
-          if (res === "granted") start();
+          gyroPermissionPending.current = false;
+          if (res === "granted") {
+            setShowGyroHint(false);
+            start();
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          gyroPermissionPending.current = false;
+        });
     };
 
-    el?.addEventListener("touchend", request, { passive: true });
-    window.addEventListener("touchend", request, { passive: true });
+    el.addEventListener("click", requestGyro);
+    el.addEventListener("touchend", requestGyro, { passive: true });
 
     return () => {
       window.removeEventListener("deviceorientation", onOrient);
-      el?.removeEventListener("touchend", request);
-      window.removeEventListener("touchend", request);
+      el.removeEventListener("click", requestGyro);
+      el.removeEventListener("touchend", requestGyro);
     };
   }, [count, scheduleIndex]);
 
@@ -160,6 +172,14 @@ export function HeroImage({ className }: { className?: string }) {
           onReady={onFrameReady}
         />
       ))}
+      {showGyroHint && (
+        <p
+          aria-hidden
+          className="pointer-events-none absolute inset-x-4 bottom-4 text-center text-[13px] tracking-tight-2 text-white/80 drop-shadow-sm"
+        >
+          Tap to enable tilt
+        </p>
+      )}
       <span className="sr-only">Listen — future founders</span>
     </div>
   );

@@ -3,9 +3,21 @@ export function splitWords(text: string): string[] {
   return text.split(/\s+/).filter(Boolean);
 }
 
+/** Join words, using a non-breaking space for the last pair when glued after orphan pull. */
+function joinLineWords(words: string[], orphanGlue: boolean): string {
+  if (words.length <= 1) return words[0] ?? "";
+  if (!orphanGlue) return words.join(" ");
+  const head = words.slice(0, -2).join(" ");
+  const tail = words.slice(-2).join("\u00a0");
+  return head ? `${head} ${tail}` : tail;
+}
+
 /**
  * Group word elements by visual line using offsetTop.
  * `wordEls` must be in the same order as `words`.
+ *
+ * Trailing single-word lines are merged onto the previous line with a
+ * non-breaking space so orphans like "company." stay with the line above.
  */
 export function groupWordsIntoLines(
   wordEls: HTMLElement[],
@@ -28,7 +40,15 @@ export function groupWordsIntoLines(
   });
 
   if (current.length) groups.push(current);
-  return groups.map((g) => g.join(" "));
+
+  const orphanGlued = new Set<number>();
+  while (groups.length > 1 && groups[groups.length - 1].length === 1) {
+    const [orphan] = groups.pop()!;
+    groups[groups.length - 1].push(orphan);
+    orphanGlued.add(groups.length - 1);
+  }
+
+  return groups.map((g, i) => joinLineWords(g, orphanGlued.has(i)));
 }
 
 /** Default clip — room for descenders (display type, nav links). */

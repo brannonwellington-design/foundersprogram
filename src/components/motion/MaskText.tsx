@@ -210,12 +210,16 @@ export function MaskText({
   // Lines: measure first, then render wipe units (no fallback paragraph).
   return createElement(
     Tag,
-    { ref: rootRef, className: cn("relative w-full", className), style },
+    {
+      ref: rootRef,
+      className: cn("relative w-full text-pretty", className),
+      style,
+    },
     <>
       <span
         ref={measureRef}
         aria-hidden
-        className="pointer-events-none invisible absolute inset-x-0 top-0"
+        className="pointer-events-none invisible absolute inset-x-0 top-0 text-pretty"
       >
         {words.map((word, i) => (
           <span key={`m-${word}-${i}`} data-line-word className="inline">
