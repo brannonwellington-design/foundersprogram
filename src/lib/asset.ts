@@ -4,8 +4,9 @@
  * routes/chunks and next/link & next/image via `basePath`, but plain <img src>
  * and CSS url() are NOT auto-prefixed — route those through asset().
  *
- * IMPORTANT: keep BASE_PATH in sync with `basePath` in next.config.mjs.
+ * IMPORTANT: keep NEXT_PUBLIC_BASE_PATH in sync with `BASE_PATH` in
+ * next.config.mjs (see .env.development for local dev).
  */
-export const BASE_PATH = "/founder-program";
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "/founder-program";
 
 export const asset = (path: string): string => `${BASE_PATH}${path}`;

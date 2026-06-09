@@ -1,29 +1,70 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { useGSAP } from "@gsap/react";
+import { WORD_STAGGER, WIPE_DURATION } from "@/lib/gsap/constants";
+import { EASE_OUT_EXPO } from "@/lib/gsap/eases";
+import {
+  prefersReducedMotion,
+  setMaskUnitsRevealed,
+} from "@/lib/gsap/reducedMotion";
+import { ensureGsapRegistered, gsap } from "@/lib/gsap/register";
+import { FOOTER_TAGLINE } from "@/lib/content";
 import { WORDMARK_LETTERS, WORDMARK_VIEWBOX } from "@/lib/wordmarkLetters";
+import { MaskGroup } from "@/components/motion/MaskGroup";
+import { MaskText } from "@/components/motion/MaskText";
 
 /**
- * Footer "Listen" wordmark (true inline SVG vector), full width and locked 24px
- * from the left/right/bottom.
- *
- * Entrance/exit: each letter is clipped to its own vertical frame and rolls up
- * from below into place (and back down out of frame on exit), one after another
- * — a sequential roll-wipe driven by whether the footer is in view.
+ * Footer wordmark — each letter wipes up in sequence on scroll, then the
+ * company tagline reveals word by word as soon as the last letter lands.
  */
 export function Footer() {
   const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { amount: 0.35 });
-  const reduce = useReducedMotion();
   const { w, h } = WORDMARK_VIEWBOX;
+  const lastLetterIndex = WORDMARK_LETTERS.length - 1;
+  // First tagline word starts as soon as "n" begins its wipe.
+  const taglineDelay = lastLetterIndex * WORD_STAGGER;
+
+  useGSAP(
+    () => {
+      ensureGsapRegistered();
+      const footer = ref.current;
+      if (!footer) return;
+
+      const letters = Array.from(
+        footer.querySelectorAll<SVGPathElement>("[data-mask-letter]"),
+      );
+      if (!letters.length) return;
+
+      if (prefersReducedMotion()) {
+        setMaskUnitsRevealed(letters as unknown as HTMLElement[]);
+        gsap.set(letters, { y: 0 });
+        return;
+      }
+
+      gsap.set(letters, { y: h });
+
+      gsap.to(letters, {
+        y: 0,
+        duration: WIPE_DURATION,
+        ease: EASE_OUT_EXPO,
+        stagger: WORD_STAGGER,
+        scrollTrigger: {
+          trigger: footer,
+          start: "top 85%",
+          once: true,
+          toggleActions: "play none none none",
+        },
+      });
+    },
+    { scope: ref, revertOnUpdate: true },
+  );
 
   return (
     <footer
       ref={ref}
       data-hide-apply-bar
-      // 16px inset on mobile (the sticky Apply bar hides at the footer); 24px on desktop.
-      className="px-4 pb-4 pt-[14vh] text-content-brand md:px-6 md:pb-6"
+      className="flex flex-col gap-4 px-4 pb-4 pt-24 text-content-brand md:gap-6 md:p-6 md:pt-[14vh]"
     >
       <svg
         viewBox={`0 0 ${w} ${h}`}
@@ -43,23 +84,35 @@ export function Footer() {
 
         {WORDMARK_LETTERS.map((l, i) => (
           <g key={i} clipPath={`url(#wm-clip-${i})`}>
-            <motion.path
+            <path
+              data-mask-letter
               d={l.d}
               fillRule="evenodd"
               aria-hidden
-              initial={false}
-              animate={{ y: reduce ? 0 : inView ? 0 : h }}
-              transition={{
-                type: "spring",
-                stiffness: 220,
-                damping: 24,
-                mass: 1,
-                delay: i * 0.07,
-              }}
+              style={{ transformBox: "fill-box", transformOrigin: "50% 100%" }}
             />
           </g>
         ))}
       </svg>
+
+      <MaskGroup
+        className="flex flex-col text-[20px] leading-[1.4] tracking-tight-2 md:text-[56px] md:leading-[1.2]"
+        scrollStart="top 85%"
+        revealDelay={taglineDelay}
+      >
+        {FOOTER_TAGLINE.map((row, rowIndex) => (
+          <div
+            key={rowIndex}
+            className="flex w-full items-center justify-between"
+          >
+            {row.map((word) => (
+              <MaskText key={word} as="span" mode="unit" className="shrink-0">
+                {word}
+              </MaskText>
+            ))}
+          </div>
+        ))}
+      </MaskGroup>
     </footer>
   );
 }

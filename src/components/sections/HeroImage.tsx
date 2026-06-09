@@ -5,30 +5,39 @@ import { HERO_IMAGES, HERO_IMAGE_FALLBACK } from "@/lib/content";
 import { cn } from "@/lib/cn";
 
 /**
- * Interactive hero image. The cursor's horizontal position across the page
- * selects which image is shown (far-left → first, far-right → last), with a
- * hard cut between them. On touch devices, tilting the phone left↔right does
- * the same via the gyroscope.
- *
- * Every frame is loaded AND decoded up front; interaction is gated until all
- * are decode-ready, so switching is instant and never flickers a blank/partly
- * decoded image during a transition.
+ * Interactive hero image. Desktop: cursor X across the page selects the frame.
+ * Mobile: tilt left↔right via gyro (HTTPS + permission on iOS), or drag across
+ * the image as a fallback (works over local HTTP during dev).
  */
 export function HeroImage({ className }: { className?: string }) {
   const count = HERO_IMAGES.length;
+  const rootRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(Math.floor(count / 2));
-  const frame = useRef<number>(0);
+  const frame = useRef(0);
   const pending = useRef<number | null>(null);
   const ready = useRef(false);
   const decoded = useRef(0);
+  const gyroActive = useRef(false);
+
+  const scheduleIndex = useCallback(
+    (idx: number) => {
+      const clamped = Math.min(count - 1, Math.max(0, idx));
+      pending.current = clamped;
+      if (!frame.current) {
+        frame.current = requestAnimationFrame(() => {
+          frame.current = 0;
+          if (pending.current !== null) setActive(pending.current);
+        });
+      }
+    },
+    [count],
+  );
 
   const onFrameReady = useCallback(() => {
     decoded.current += 1;
     if (decoded.current >= count) ready.current = true;
   }, [count]);
 
-  // Safety net: unlock interaction even if a frame's decode() never reports
-  // back (which would otherwise leave the cursor/gyro permanently gated).
   useEffect(() => {
     const t = window.setTimeout(() => {
       ready.current = true;
@@ -43,14 +52,7 @@ export function HeroImage({ className }: { className?: string }) {
     function onMove(e: MouseEvent) {
       if (!ready.current) return;
       const ratio = e.clientX / window.innerWidth;
-      const idx = Math.min(count - 1, Math.max(0, Math.floor(ratio * count)));
-      pending.current = idx;
-      if (!frame.current) {
-        frame.current = requestAnimationFrame(() => {
-          frame.current = 0;
-          if (pending.current !== null) setActive(pending.current);
-        });
-      }
+      scheduleIndex(Math.floor(ratio * count));
     }
 
     window.addEventListener("mousemove", onMove, { passive: true });
@@ -58,25 +60,44 @@ export function HeroImage({ className }: { className?: string }) {
       window.removeEventListener("mousemove", onMove);
       if (frame.current) cancelAnimationFrame(frame.current);
     };
-  }, [count]);
+  }, [count, scheduleIndex]);
 
-  // Touch devices: tilt the phone left↔right (gyroscope).
+  // Mobile: horizontal drag on the hero (works without gyro / over HTTP).
   useEffect(() => {
     if (window.matchMedia("(pointer: fine)").matches) return;
 
-    const TILT = 35; // degrees of tilt mapped across all frames
+    const el = rootRef.current;
+    if (!el) return;
+
+    const pickFromTouch = (clientX: number) => {
+      if (!ready.current || gyroActive.current) return;
+      const { left, width } = el.getBoundingClientRect();
+      if (width <= 0) return;
+      const ratio = (clientX - left) / width;
+      scheduleIndex(Math.floor(ratio * count));
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (touch) pickFromTouch(touch.clientX);
+    };
+
+    el.addEventListener("touchmove", onTouchMove, { passive: true });
+    return () => el.removeEventListener("touchmove", onTouchMove);
+  }, [count, scheduleIndex]);
+
+  // Mobile: tilt left↔right via gyroscope (requires HTTPS on iOS).
+  useEffect(() => {
+    if (window.matchMedia("(pointer: fine)").matches) return;
+
+    const TILT = 35;
     const onOrient = (e: DeviceOrientationEvent) => {
+      if (!ready.current) return;
       const gamma = e.gamma;
       if (gamma == null) return;
+      gyroActive.current = true;
       const clamped = Math.max(-TILT, Math.min(TILT, gamma));
-      const idx = Math.round(((clamped + TILT) / (TILT * 2)) * (count - 1));
-      pending.current = idx;
-      if (!frame.current) {
-        frame.current = requestAnimationFrame(() => {
-          frame.current = 0;
-          if (pending.current !== null) setActive(pending.current);
-        });
-      }
+      scheduleIndex(Math.round(((clamped + TILT) / (TILT * 2)) * (count - 1)));
     };
 
     const start = () => window.addEventListener("deviceorientation", onOrient);
@@ -90,14 +111,17 @@ export function HeroImage({ className }: { className?: string }) {
         : undefined;
     if (!DOEvent) return;
 
+    if (!window.isSecureContext) {
+      // iOS blocks gyro over http://192.168.x.x — touch drag is the fallback.
+      return;
+    }
+
     if (typeof DOEvent.requestPermission !== "function") {
-      // Android etc.: no permission needed, attach immediately.
       start();
       return () => window.removeEventListener("deviceorientation", onOrient);
     }
 
-    // iOS: requestPermission must run inside a user gesture. Use touchend/click
-    // (which reliably trigger the prompt — NOT pointerdown), once.
+    const el = rootRef.current;
     let requested = false;
     const request = () => {
       if (requested) return;
@@ -107,21 +131,26 @@ export function HeroImage({ className }: { className?: string }) {
           if (res === "granted") start();
         })
         .catch(() => {});
-      window.removeEventListener("touchend", request);
-      window.removeEventListener("click", request);
     };
-    window.addEventListener("touchend", request);
-    window.addEventListener("click", request);
+
+    el?.addEventListener("touchend", request, { passive: true });
+    window.addEventListener("touchend", request, { passive: true });
 
     return () => {
       window.removeEventListener("deviceorientation", onOrient);
+      el?.removeEventListener("touchend", request);
       window.removeEventListener("touchend", request);
-      window.removeEventListener("click", request);
     };
-  }, [count]);
+  }, [count, scheduleIndex]);
 
   return (
-    <div className={cn("relative overflow-hidden bg-surface-secondary", className)}>
+    <div
+      ref={rootRef}
+      className={cn(
+        "relative touch-pan-y overflow-hidden bg-surface-secondary",
+        className,
+      )}
+    >
       {HERO_IMAGES.map((src, i) => (
         <HeroFrame
           key={src}
@@ -150,8 +179,6 @@ function HeroFrame({
   const ref = useRef<HTMLImageElement>(null);
   const [resolvedSrc, setResolvedSrc] = useState(src);
 
-  // Force a full decode up front so the first paint of this frame (when it
-  // becomes active) doesn't flicker.
   useEffect(() => {
     const img = ref.current;
     if (!img) return;
@@ -182,7 +209,6 @@ function HeroFrame({
         if (resolvedSrc !== HERO_IMAGE_FALLBACK) setResolvedSrc(HERO_IMAGE_FALLBACK);
       }}
       className={cn(
-        // Hard cut between frames (no fade) for a crisp, responsive feel.
         "absolute inset-0 h-full w-full object-cover",
         active ? "opacity-100" : "opacity-0",
       )}

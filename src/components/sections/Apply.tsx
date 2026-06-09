@@ -4,8 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { APPLY } from "@/lib/content";
 import { asset } from "@/lib/asset";
-import { SectionLabel } from "@/components/ui/SectionLabel";
+import { MaskGroup } from "@/components/motion/MaskGroup";
+import { MaskMedia } from "@/components/motion/MaskMedia";
+import { MaskText } from "@/components/motion/MaskText";
+import { SectionLabel, sectionLabelTop } from "@/components/ui/SectionLabel";
 import { ApplyButton } from "@/components/ui/ApplyButton";
+import { cn } from "@/lib/cn";
 
 export function Apply() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -23,63 +27,54 @@ export function Apply() {
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  // Mobile reveal: the text card starts fully below the (square) image — so the
-  // photo reads unobscured as it scrolls into frame — then rises up into its
-  // resting spot (y: 0) and holds there as the rest of the section scrolls past.
-  // It finishes rising before the section reaches center (~0.52), so the CTA has
-  // fully cleared the image's bottom edge by the time the panel is read.
-  // `y` is a percentage of the card's own height, so it clears any size. (clamps
-  // outside the input range, so it stays hidden before and settled after.)
   const panelY = useTransform(scrollYProgress, [0.15, 0.4], ["110%", "0%"]);
 
   return (
     <section
       ref={sectionRef}
       data-hide-apply-bar
-      className="bg-surface-primary px-4 pb-6 pt-6 md:px-6"
+      className={cn("bg-surface-primary px-4 pb-6 md:px-6", sectionLabelTop)}
     >
       <SectionLabel id="apply" label="Apply" />
 
-      {/* Mobile: 1:1 square, full-bleed edge-to-edge (cancel the section's px-4).
-          Desktop: inset within the section, 760px tall. */}
-      <div className="relative -mx-4 mt-6 aspect-square overflow-hidden md:mx-0 md:aspect-auto md:min-h-[760px]">
-        {/* Full-bleed background photo (static). */}
+      <div className="relative -mx-4 mt-6 aspect-square overflow-visible max-md:mb-[76px] md:mx-0 md:mb-0 md:aspect-auto md:min-h-[760px] md:overflow-hidden">
         <div
           aria-hidden
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${asset("/images/apply-bg.webp")})` }}
         />
 
-        {/* Panel fills the image box and bottom-aligns its content (24px from
-            the bottom edge); it parallaxes up over the photo on mobile, static
-            left column on desktop. */}
-        <div className="absolute inset-0 flex items-end p-4 pb-6 md:p-6">
+        <div className="absolute inset-0 flex items-end px-4 pb-0 md:grid md:grid-cols-12 md:gap-x-6 md:p-6">
           <motion.div
             style={{ y: isMobile ? panelY : undefined }}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5 }}
-            className="flex w-full max-w-[572px] flex-col self-end"
+            className="w-full min-w-0 max-md:-mb-[76px] md:col-span-5 md:col-start-1 md:self-end"
           >
-            {/* Content-height text card with 24px between heading and body, so
-                more of the background image shows above it. */}
-            <div className="flex flex-col gap-6 bg-surface-primary p-6">
-              <h2
-                className="text-content-brand tracking-tight-2 md:text-balance"
-                style={{ fontSize: "clamp(2.25rem, 4.8vw, 3.5rem)", lineHeight: 1.15 }}
-              >
-                {APPLY.heading}
-              </h2>
-              <p
-                className="text-[16px] text-content-brand tracking-tight-2 md:text-[20px]"
-                style={{ lineHeight: 1.4 }}
-              >
-                {APPLY.body}
-              </p>
-            </div>
+            <div className="flex w-full min-w-0 flex-col">
+              <MaskGroup className="flex w-full min-w-0 flex-col gap-6 bg-surface-primary p-6">
+                <MaskText
+                  as="h2"
+                  mode="words"
+                  className="w-full text-[28px] text-content-brand leading-[1.2] tracking-tight-2 md:text-[40px]"
+                >
+                  {APPLY.heading}
+                </MaskText>
+                <MaskText
+                  as="p"
+                  mode="unit"
+                  className="w-full text-[16px] text-content-brand leading-[22px] tracking-tight-2 md:text-[24px] md:leading-[1.4]"
+                >
+                  {APPLY.body}
+                </MaskText>
+              </MaskGroup>
 
-            <ApplyButton fill size="lg" label={APPLY.cta} />
+              <MaskMedia
+                releaseClip
+                className="w-full"
+                innerClassName="block w-full"
+              >
+                <ApplyButton fill size="lg" label={APPLY.cta} />
+              </MaskMedia>
+            </div>
           </motion.div>
         </div>
       </div>

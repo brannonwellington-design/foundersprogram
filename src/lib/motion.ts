@@ -60,6 +60,37 @@ export const maskRise: Variants = {
   }),
 };
 
+/** Curtain fill rising into view on hover (paired with `maskHoverSwap`). */
+export const maskHoverRise: Variants = {
+  rest: { y: "100%" },
+  hover: {
+    y: "0%",
+    transition: { duration: 0.48, ease: easeOutExpo },
+  },
+};
+
+/** Two-line stack inside `overflow-hidden`; shifts up to swap contrast ↔ brand. */
+export const maskHoverSwap: Variants = {
+  rest: { y: "0%" },
+  hover: {
+    y: "-50%",
+    transition: { duration: 0.42, ease: easeOutExpo, delay: 0.06 },
+  },
+};
+
+/** Label/arrow swap plus a slight forward nudge on the arrow. */
+export const maskHoverSwapArrow: Variants = {
+  rest: { y: "0%", x: 0 },
+  hover: {
+    y: "-50%",
+    x: 5,
+    transition: {
+      y: { duration: 0.42, ease: easeOutExpo, delay: 0.1 },
+      x: { duration: 0.35, ease: easeOutExpo, delay: 0.1 },
+    },
+  },
+};
+
 /**
  * Soft fade + rise for elements that don't get a hard mask (pills, buttons).
  * `custom` is the absolute start delay in seconds.

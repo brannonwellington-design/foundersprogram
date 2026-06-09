@@ -39,9 +39,12 @@ breaks. See `src/components/sections/HeroImage.tsx`.
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
-npm run build    # production build
+npm run dev      # http://localhost:3000 (root; see .env.development)
+npm run build    # production build (served under /founder-program)
 ```
+
+Production deploys use `basePath` `/founder-program` (see `next.config.mjs`). Local
+dev clears that via `.env.development` so you are not hitting a 404 at `/`.
 
 ## Images
 

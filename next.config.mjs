@@ -1,8 +1,12 @@
 /** @type {import('next').NextConfig} */
+const basePath = process.env.BASE_PATH ?? "/founder-program";
+
 const nextConfig = {
   reactStrictMode: true,
-  // App is served under this sub-path. Keep in sync with BASE_PATH in
-  // src/lib/asset.ts (which prefixes plain <img>/CSS url() assets).
-  basePath: "/founder-program",
+  // Sub-path in production (e.g. listenlabs.com/founder-program). Empty in
+  // .env.development for local dev at /. Keep in sync with asset.ts.
+  ...(basePath ? { basePath } : {}),
+  outputFileTracingRoot: import.meta.dirname,
 };
+
 export default nextConfig;

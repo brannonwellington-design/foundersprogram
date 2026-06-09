@@ -39,9 +39,17 @@
   --surface-inverse-secondary: #1f1b14;
   --surface-brand-primary: #0021cc;
   --surface-brand-secondary: #d9ddf2;
+  --surface-complimentary-primary: #e5a119;
+  --surface-complimentary-secondary: #f5ebd6;
+  --surface-warning-primary: #cf6317;
+  --surface-warning-secondary: #f5e3d6;
+  --surface-negative-primary: #cf2617;
+  --surface-negative-secondary: #f5d9d6;
+  --surface-positive-primary: #14b84b;
+  --surface-positive-secondary: #d6f5e0;
 
-  /* Hero "This could be you" accent disc (art element from the design). */
-  --hero-accent: #e8412b;
+  /* Dev grid overlay column fill (settings → 12-column grid). */
+  --grid-overlay-column: color-mix(in srgb, var(--content-brand) 4%, transparent);
 
   color-scheme: light;
 }
@@ -72,8 +80,16 @@
   --surface-inverse-secondary: #f0e9db;
   --surface-brand-primary: #0021cc;
   --surface-brand-secondary: #131939;
+  --surface-complimentary-primary: #e5a119;
+  --surface-complimentary-secondary: #f5ebd6;
+  --surface-warning-primary: #cf6317;
+  --surface-warning-secondary: #f5e3d6;
+  --surface-negative-primary: #cf2617;
+  --surface-negative-secondary: #f5d9d6;
+  --surface-positive-primary: #14b84b;
+  --surface-positive-secondary: #d6f5e0;
 
-  --hero-accent: #e8412b;
+  --grid-overlay-column: color-mix(in srgb, var(--content-brand) 14%, transparent);
 
   color-scheme: dark;
 }
@@ -86,10 +102,13 @@
   --color-content-inverse-primary: var(--content-inverse-primary);
   --color-content-inverse-secondary: var(--content-inverse-secondary);
   --color-content-disabled: var(--content-disabled);
+  --color-content-inverse-disabled: var(--content-inverse-disabled);
   --color-content-brand: var(--content-brand);
   --color-content-brand-secondary: var(--content-brand-secondary);
   --color-content-brand-contrast: var(--content-brand-contrast);
   --color-content-brand-contrast-secondary: var(--content-brand-contrast-secondary);
+  --color-content-complimentary: var(--content-complimentary);
+  --color-content-warning: var(--content-warning);
   --color-content-positive: var(--content-positive);
   --color-content-negative: var(--content-negative);
 
@@ -101,6 +120,14 @@
   --color-surface-inverse-secondary: var(--surface-inverse-secondary);
   --color-surface-brand-primary: var(--surface-brand-primary);
   --color-surface-brand-secondary: var(--surface-brand-secondary);
+  --color-surface-complimentary-primary: var(--surface-complimentary-primary);
+  --color-surface-complimentary-secondary: var(--surface-complimentary-secondary);
+  --color-surface-warning-primary: var(--surface-warning-primary);
+  --color-surface-warning-secondary: var(--surface-warning-secondary);
+  --color-surface-negative-primary: var(--surface-negative-primary);
+  --color-surface-negative-secondary: var(--surface-negative-secondary);
+  --color-surface-positive-primary: var(--surface-positive-primary);
+  --color-surface-positive-secondary: var(--surface-positive-secondary);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
@@ -111,6 +138,13 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: clip;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
   }
 
   body {
@@ -118,7 +152,8 @@
     color: var(--content-primary);
     font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     font-weight: 400; /* Brand rule: Inter Regular only — never bold, never light. */
-    transition: background-color 0.6s ease, color 0.6s ease;
+    overflow-x: clip;
+    max-width: 100%;
   }
 
   /* Brand rule: never override letter-spacing globally; headings use a tight
@@ -141,13 +176,18 @@
     background-color: currentColor;
     opacity: 0.35;
   }
+
+  .grid-overlay-column {
+    background-color: var(--grid-overlay-column);
+  }
 }
 
-/* Honor reduced-motion: kill transforms/animation but keep content fully visible. */
+/* Honor reduced-motion: kill transforms/animation but keep content fully visible.
+   Theme wipe is excluded so the mode transition stays intentional and visible. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *:not([data-theme-wipe]):not([data-theme-wipe] *),
+  *:not([data-theme-wipe]):not([data-theme-wipe] *)::before,
+  *:not([data-theme-wipe]):not([data-theme-wipe] *)::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;

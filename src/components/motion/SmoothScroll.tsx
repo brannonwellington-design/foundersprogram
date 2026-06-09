@@ -3,16 +3,19 @@
 import { useEffect } from "react";
 import { MotionConfig } from "motion/react";
 import Lenis from "lenis";
+import { ensureGsapRegistered, gsap, ScrollTrigger } from "@/lib/gsap/register";
+import { registerLenis, unregisterLenis } from "@/lib/scrollLock";
 
 /**
- * Lenis smooth scroll. Drives the whole page's scroll feel and is the
- * backbone the scroll-reveals and parallax read from. Disabled automatically
- * for users who prefer reduced motion.
+ * Lenis smooth scroll, synced to GSAP ScrollTrigger via the shared ticker.
+ * MotionConfig still honors reduced motion for remaining Motion micro-interactions.
  */
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
+
+    ensureGsapRegistered();
 
     const lenis = new Lenis({
       duration: 1.1,
@@ -21,14 +24,15 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       touchMultiplier: 1.6,
     });
 
-    let frame = 0;
-    function raf(time: number) {
-      lenis.raf(time);
-      frame = requestAnimationFrame(raf);
-    }
-    frame = requestAnimationFrame(raf);
+    lenis.on("scroll", ScrollTrigger.update);
+    registerLenis(lenis);
 
-    // Let in-page anchor links use Lenis for a smooth, eased jump.
+    const tick = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
+
     function onAnchorClick(e: MouseEvent) {
       const target = (e.target as HTMLElement)?.closest('a[href^="#"]');
       if (!target) return;
@@ -42,14 +46,12 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     document.addEventListener("click", onAnchorClick);
 
     return () => {
-      cancelAnimationFrame(frame);
+      unregisterLenis(lenis);
+      gsap.ticker.remove(tick);
       document.removeEventListener("click", onAnchorClick);
       lenis.destroy();
     };
   }, []);
 
-  // `reducedMotion="user"` makes every motion component honor the OS setting,
-  // stripping transform/clip entrances (and keeping content visible) for users
-  // who prefer reduced motion — matching the CSS guard in globals.css.
   return <MotionConfig reducedMotion="user">{children}</MotionConfig>;
 }

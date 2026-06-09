@@ -8,9 +8,13 @@ import {
   useSpring,
 } from "motion/react";
 import { TESTIMONIALS, type Testimonial } from "@/lib/content";
+import { grid12, gridWide } from "@/lib/grid";
+import { cn } from "@/lib/cn";
 import { springSnappyOptions, reel } from "@/lib/motion";
-import { Reveal } from "@/components/motion/Reveal";
-import { SectionLabel } from "@/components/ui/SectionLabel";
+import { MaskGroup } from "@/components/motion/MaskGroup";
+import { MaskMedia } from "@/components/motion/MaskMedia";
+import { MaskText } from "@/components/motion/MaskText";
+import { SectionLabel, sectionLabelTop } from "@/components/ui/SectionLabel";
 import { Figure } from "@/components/ui/Figure";
 
 export function Testimonials() {
@@ -18,15 +22,12 @@ export function Testimonials() {
   const sectionRef = useRef<HTMLElement>(null);
   const ready = useRef(false);
 
-  // Cursor-following card (desktop only). Springs toward the pointer.
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const sx = useSpring(x, springSnappyOptions);
   const sy = useSpring(y, springSnappyOptions);
 
   function handleMove(e: React.MouseEvent) {
-    // The first time we know where the cursor is, snap the spring there so the
-    // card never flies in from the top-left corner (0,0).
     if (!ready.current) {
       sx.jump(e.clientX);
       sy.jump(e.clientY);
@@ -41,39 +42,39 @@ export function Testimonials() {
       id="testimonials"
       ref={sectionRef}
       onMouseMove={handleMove}
-      className="relative bg-surface-primary px-4 pb-40 pt-6 md:px-6"
+      className={cn("relative bg-surface-primary px-4 pb-40 md:px-6", sectionLabelTop)}
     >
       <SectionLabel label="Testimonials" />
 
-      <div className="mx-auto mt-32 flex max-w-[1216px] flex-col gap-32 md:gap-48">
+      <div className={cn("mt-32 flex flex-col gap-32 md:gap-48", grid12)}>
         {TESTIMONIALS.map((t, i) => (
-          <div key={t.name} className="flex flex-col gap-6">
-            <Reveal>
-              <blockquote
-                className="cursor-default text-content-brand tracking-tight-2 transition-opacity duration-300"
+          <div key={t.name} className={cn("flex flex-col gap-6", gridWide)}>
+            <div
+              onMouseEnter={(e) => {
+                handleMove(e);
+                setActive(i);
+              }}
+              onMouseLeave={() => setActive(null)}
+            >
+              <MaskText
+                as="blockquote"
+                mode="words"
+                className="m-0 cursor-default border-0 text-content-brand tracking-tight-2 transition-opacity duration-300"
                 style={{
                   fontSize: "clamp(1.5rem, 3.2vw, 2.5rem)",
                   lineHeight: 1.2,
-                  // Dim the other quote while one is hovered (desktop).
                   opacity: active === null || active === i ? 1 : 0.35,
                 }}
-                onMouseEnter={(e) => {
-                  handleMove(e); // position the card at the cursor before showing
-                  setActive(i);
-                }}
-                onMouseLeave={() => setActive(null)}
               >
                 {t.quote}
-              </blockquote>
-            </Reveal>
+              </MaskText>
+            </div>
 
-            {/* Mobile: static attribution card under each quote. */}
             <MobileAttribution testimonial={t} />
           </div>
         ))}
       </div>
 
-      {/* Desktop: floating card that follows the cursor over a quote. */}
       <CursorCard active={active} sx={sx} sy={sy} />
     </section>
   );
@@ -81,25 +82,29 @@ export function Testimonials() {
 
 function MobileAttribution({ testimonial: t }: { testimonial: Testimonial }) {
   return (
-    // Always shown except on desktop-with-mouse (where the cursor card is used).
-    // Gating on `md AND fine` avoids phones that misreport pointer capability.
-    <div className="flex items-center gap-4 md:fine:hidden">
-      <Figure
-        src={t.image}
-        alt={t.name}
-        name={t.name}
-        variant="duotone"
-        blendImage={false}
-        className="size-[136px] shrink-0"
-      />
+    <MaskGroup className="grid w-full grid-cols-12 gap-x-4 md:fine:hidden">
+      <MaskMedia className="col-span-4 min-w-0">
+        <Figure
+          src={t.image}
+          alt={t.name}
+          name={t.name}
+          variant="duotone"
+          blendImage={false}
+          className="aspect-square w-full"
+        />
+      </MaskMedia>
       <div
-        className="flex flex-1 flex-col justify-center text-left text-[14px] tracking-tight-2"
+        className="col-span-8 col-start-5 flex min-w-0 flex-col justify-center text-left text-[14px] tracking-tight-2"
         style={{ lineHeight: "20px" }}
       >
-        <span className="text-content-brand">{t.name}</span>
-        <span className="text-content-brand-secondary">{t.role}</span>
+        <MaskText as="span" mode="unit" className="text-content-brand">
+          {t.name}
+        </MaskText>
+        <MaskText as="span" mode="unit" className="text-content-brand-secondary">
+          {t.role}
+        </MaskText>
       </div>
-    </div>
+    </MaskGroup>
   );
 }
 
@@ -119,11 +124,6 @@ function CursorCard({
       style={{ x: sx, y: sy, translateX: "24px", translateY: "-50%" }}
       aria-hidden
     >
-      {/* Photo reel: each opaque duotone plate rolls up into the window from the
-          bottom while the previous one rolls out the top. Because the plates
-          overlap and never leave a gap, rapid hops between people read as a
-          continuous slot-machine roll rather than a blank-then-repopulate. The
-          window clips the off-screen frames. */}
       <div className="relative aspect-square w-full overflow-hidden">
         <AnimatePresence>
           {t && (
@@ -148,8 +148,6 @@ function CursorCard({
         </AnimatePresence>
       </div>
 
-      {/* Attribution rolls in lockstep with the photo, clipped to its own
-          two-line strip so the names swap on the same reel. */}
       <div className="relative h-10 overflow-hidden">
         <AnimatePresence>
           {t && (

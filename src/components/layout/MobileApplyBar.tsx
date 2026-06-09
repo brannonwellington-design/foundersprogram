@@ -104,6 +104,7 @@ export function MobileApplyBar() {
             exit={{ y: "100%" }}
             transition={spring}
             className="fixed inset-x-0 bottom-0 z-40 block"
+            data-mobile-apply-bar
           >
             <div className="relative">
               {/* Base: brand-blue with contrast content. */}

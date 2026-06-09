@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
+import { DevSettingsProvider } from "@/components/layout/DevSettings";
 
 /** Brand rule: Inter, weight 400 only. */
 const inter = Inter({
@@ -33,11 +35,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // Light mode only for now. The dark tokens remain in globals.css and the
-    // ThemeToggle component is kept, so dark mode can be re-enabled later.
-    <html lang="en" className={inter.variable} data-theme="light">
+    <html lang="en" className={inter.variable} data-theme="light" suppressHydrationWarning>
+      <head>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}`}
+        </Script>
+      </head>
       <body>
-        <SmoothScroll>{children}</SmoothScroll>
+        <DevSettingsProvider>
+          <div id="app-root">
+            <SmoothScroll>{children}</SmoothScroll>
+          </div>
+        </DevSettingsProvider>
       </body>
     </html>
   );
