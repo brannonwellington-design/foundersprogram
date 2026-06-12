@@ -4,6 +4,14 @@ import Script from "next/script";
 import "./globals.css";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { DevSettingsProvider } from "@/components/layout/DevSettings";
+import {
+  SHARE_IMAGE,
+  SITE_DESCRIPTION,
+  SITE_DESCRIPTION_SHORT,
+  SITE_PATH,
+  SITE_TITLE,
+  SITE_URL,
+} from "@/lib/metadata";
 
 /** Brand rule: Inter, weight 400 only. */
 const inter = Inter({
@@ -14,14 +22,32 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Listen Future Founder Program",
-  description:
-    "A cohort program for exceptional talent at the beginning of their founding journey. When anyone can build, knowing what to build is everything.",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: SITE_PATH || "/",
+  },
   openGraph: {
-    title: "Listen Future Founder Program",
-    description:
-      "A cohort program for exceptional talent at the beginning of their founding journey.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION_SHORT,
     type: "website",
+    url: SITE_PATH || "/",
+    images: [
+      {
+        url: SHARE_IMAGE.path,
+        width: SHARE_IMAGE.width,
+        height: SHARE_IMAGE.height,
+        alt: SHARE_IMAGE.alt,
+        type: "image/webp",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION_SHORT,
+    images: [SHARE_IMAGE.path],
   },
 };
 
