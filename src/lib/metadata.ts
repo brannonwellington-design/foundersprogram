@@ -16,12 +16,12 @@ export const SITE_DESCRIPTION_SHORT =
   "A cohort program for exceptional talent at the beginning of their founding journey.";
 
 /**
- * Social share image — same file as the hero fallback portrait.
+ * Landscape social share image (1200×630) — center crop of the hero art.
  * `basePath` is not auto-applied to metadata image URLs, so include SITE_PATH.
  */
 export const SHARE_IMAGE = {
-  path: `${SITE_PATH}/images/hero-portrait.webp`,
-  width: 720,
-  height: 686,
+  path: `${SITE_PATH}/images/og-image.jpg`,
+  width: 1200,
+  height: 630,
   alt: SITE_TITLE,
 } as const;

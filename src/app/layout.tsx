@@ -39,7 +39,7 @@ export const metadata: Metadata = {
         width: SHARE_IMAGE.width,
         height: SHARE_IMAGE.height,
         alt: SHARE_IMAGE.alt,
-        type: "image/webp",
+        type: "image/jpeg",
       },
     ],
   },
